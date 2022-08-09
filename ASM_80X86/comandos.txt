@@ -1,0 +1,20 @@
+LINUX
+Fiaca
+
+WINDOWS
+Generar codigo objeto
+
+nasm NombrePrograma.asm -fwin64
+
+;el f hace referencia al formato del codigo objeto q quiero generar (codigo objeto win64)
+
+gcc NombrePrograma.obj - o NombrePrograma
+
+y deberia haberse generado el ejecutable:
+
+NombrePrograma.exe
+
+
+nasm NombrePrograma.asm -fwin64
+gcc NombrePrograma.obj - o NombrePrograma
+ejecutar NombrePrograma.exe

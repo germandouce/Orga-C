@@ -13,7 +13,7 @@ section .data
     ; al hacer db "string" resero tantos bytes como son necesarios para que entre
     ;ese string
 
-section .bss
+section .bss    ; Block Started by Symbol
     ;En este programa en particular no la usaremos
 
 section .text

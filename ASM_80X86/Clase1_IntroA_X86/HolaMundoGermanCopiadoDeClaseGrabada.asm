@@ -44,5 +44,5 @@ main:
 
     ;la manera de pasar parametros a una funcion en asm es con registros, asi:
     ;en windows el parametro 1, esta en el rcx, el param 2 en rdx, el 3 etc.
-    ;(rcx rdx r8 r9, a partir de r9 en el STACK)
+    ;" printf (rcx, rdx, r8, r9, a partir de r9 en el STACK) "
     ret

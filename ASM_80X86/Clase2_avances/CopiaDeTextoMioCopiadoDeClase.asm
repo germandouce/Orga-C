@@ -28,7 +28,11 @@ section     .data   ;con contenido
     ;para que el usuario ingrese el texto
     msjTextoInv     db "Texto invertido: %s ",10,0 ;el 10 genera un /n, salto de linea y el 0 es xa cortar el printf
     msjCantidad     db "El caracter %c aparece %lli veces.",10,0. ; %c es el caracter lli es long long int
+    ;esta parametrizado osea que requiere dos parametros
     msjPorcentaje   db "El porcentaje de aparicion es %lli %%",0
+
+;Para debug
+    msjLongTexto    db "Longitud de texto: %lli",10,0
 
 section     .bss    ;sin contenido
     
@@ -45,22 +49,27 @@ main:
 ; ingreso texto
     ;mensaje pidiendo el texto
     ;como para imprimir con puts el primer parametro de puts debe estar en el resgistro rcx..
-    mov     rcx, msjInTexto
+    mov     rcx, msjIngTexto
     sub     rsp, 32 ;x el llamado a una funcion externo. Es debido al registro de stack pointer
     call    puts
     add     rsp, 32
 
 ;ingreso por teclado del texto
-    mov     rcx, texto; el parametro es el buffer donde guardo lo q ingreso el usuario (en .bss)
-    sub     rsp, 32
+    mov     rcx,texto; el parametro es el buffer donde guardo lo q ingreso el usuario (en .bss)
+    sub     rsp,32
     call    gets
-    add     rsp, 32
+    add     rsp,32
 
 ;ingreso de caracter
+    mov     rcx,msjIngCaracter
+    sub     rsp,32
+    call    puts
+    add     rsp,32
+
     mov     rcx, caracter 
-    sub     rsp, 32
+    sub     rsp,32
     call    gets
-    add     rsp, 32
+    add     rsp,32
 
 ;recorrer cadena de caracteres. Una manera es con un indide.
 ;otra es recorrerlo con un registro. En gral se usa el rsi
@@ -88,7 +97,7 @@ compCaracter:
     inc     qword[contadorCarac]
 
 sgteCarac:
-    inc     rsi; para recorrer el vector
+    inc     rsi; funciona como un indice para recorrer el vector
     jmp     compCaracter; bifurcamos "hacia arriba para que funcione como un ciclo de iteraciones"
     ;Esto va a iterar hasta que se cumpla la condicion en linea 77 je   finString
 
@@ -97,12 +106,14 @@ sgteCarac:
 finString: ;este rotulo va afuera del ciclo
 ;invierto texto
     
+    ;rcx se usa para saber la long del texto. No es lo mismo que el indice rsi
     mov     rcx, qword[longTexto] ;copio la pos del ult caracter al rcx 
     mov     rdi, 0; para q apunte al primer caracter de textoInv y almacene los chars de forma invertida
-    
-    comp    rcx,0
+
+copioCarac: ; esto le da inicio al ciclo de iteraciones de la copia 'invertida' de caracteres
+
+    cmp    rcx,0 ;significa que se recorrrio todo el texto
     je      finCopia
-    
     ;puedo aprovechar que mi indice rsi quedo en la ult pos del texto para recorrerlo al reves
     ;mov     byte[textoInv + rdi], byte [texto + rsi -1]; 2 en el parcial xq la mov no permite copiar de mem a mem 
     mov     al, byte[texto + rsi - 1] ; el menos 1 xq no quiero copiar el byte 0 de control
@@ -114,5 +125,56 @@ finString: ;este rotulo va afuera del ciclo
     inc     rdi
     dec     rsi
     dec     rcx
+    jmp     copioCarac
+
+    ;otra opcion es no usar rsi e ir decrementando directament rcx y usarlo d indice
+
+finCopia:
+
+; modo debug para mostrar longitud texto
+
+    mov     rcx, msjLongTexto
+    mov     rdx,qword[longTexto]
+    sub     rsp,32
+    call    printf
+    add     rsp,32
+
+; imprimo texto invertido
+    mov     byte[textoInv + rdi],0 ;porque al imprimir el texto voy a necesitar concatenar un byte 0
+    
+    mov     rcx, msjTextoInv
+    mov     rdx, textoInv
+    sub     rsp,32
+    call    printf
+    add     rsp,32
+
+; imprimo cantidad de apariciones dentro del texto
+    mov     rcx,msjCantidad
+    mov     dl,byte[caracter]; necesito guardar el contenido del caracter en el regitro dl xq quiero
+    ;pasarlo por parametro al %c. DEBE IR DL xq hay q respetar el tam del registro, 1 char es un byte
+    ;Si meto rdx, arrastro 7 bytes y...
+    mov     r8,qword[contadorCarac]; y el tercer resgitro va con el numero de la cant de veces para el %lli
+    sub     rsp,32
+    call    printf
+    add     rsp,32
+
+; imprimir de porcentaje de apariciones
+    ;calculo el porcentaje
+    imul    rax,qword[contadorCarac],100; dejo el resultado de multiplicacion de cant*100 en el rax
+    ;son BPF c/signo. N:B tenerlo n cuenta para una division porque si dx llega a tener un cont 
+    ;distinto a 0 me gustaria poder inicializarlo en 0 para q dsps de la divi no me cambie el signo
+    mov     rdx, 0; inicializo en 0 el rdx para que no me cambie el signo. 
+    ;rdx, podria completarse sin querer con todas F's y tendria un numero negativo
+    idiv    qword[longTexto] ;rdx:rax / qword[longTexto] -> resto en RDX| cociente en RAX (*)
+    
+    ;imprimo mensaje infromando %
+    mov     rcx,msjPorcentaje; cargo el msj en el 1er parametro
+    mov     rdx, rax ; el valor del porcentaje que quedo en RAX (*) 
+    sub     rsp,32
+    call    printf
+    add     rsp, 32
+
+    ;se podria haber usado mul en vez de imul, en ese caso, la linea 149 no va xq al ser bpf sin signo, no se agregan F's para completar el signo
+
 
     ret

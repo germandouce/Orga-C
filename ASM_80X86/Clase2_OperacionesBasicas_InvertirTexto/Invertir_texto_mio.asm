@@ -136,7 +136,7 @@ finCopia:
     mov     rcx, msjLongTexto
     mov     rdx,qword[longTexto]
     sub     rsp,32
-    call    printf
+    call    printf  ;permite imprimir numeros printf a diferencia de puts
     add     rsp,32
 
 ; imprimo texto invertido

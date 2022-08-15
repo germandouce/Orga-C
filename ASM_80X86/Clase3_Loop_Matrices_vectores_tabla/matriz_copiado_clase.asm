@@ -22,6 +22,13 @@
 ;  2     2   2   2   2 
 ; 3(no!) 3 + 3 + 3 + 3 = 12
 
+;3 1 ->  toda la fila 3, 5*3 = 15
+;3 4 -> ults 2 valores de la fila 3 -> 3 + 3 = 6
+
+;formula para cant de veces a sumar: 
+;(columnas_totales + 1) - columna_elegida
+;col 2 -> (5 + 1)       -       2         = 4 veces
+;
 ;vamos a usar un ejempo de 5x5 pero vamos a intentar q sea "standard"
 ;vamos a reservar memoria en .bss xq si o si necesitamos 
 
@@ -52,7 +59,7 @@ section     .data   ;variables con valores predefinidos (repaso jeje)
         formatInputFilCol   db "%hi %hi",0 ;hi (16 bits, 2 bytes 1 word)
         ;esto es para el sscanf
 
-        msjSumatorial       db "La sumatoria es : %i",10,0 ; %i 32 bits (doble plbra dword dd)
+        msjSumatoria        db "La sumatoria es : %i",10,0 ; %i 32 bits (doble plbra dword dd)
 
 
 section     .bss
@@ -65,6 +72,8 @@ section     .bss
         inputValido     resb    1 ;un caracter para usar como variable de control que valide 
         ;"S" valido "N" invalido. Es interna mia.
 
+        desplaz         resw    1
+
         sumatoria       resd    1 ;rserve 4 bytes por si la sumatoria llega  dar muy grande
 
         inputFilCol     resb    50;"para el texto por teclado, en este caso, fila y col"
@@ -74,6 +83,8 @@ section     .bss
 section     .text
 
 main:
+ingresoDatos:
+
         ;imprimo por pantalla pedido de fil y columna (rcx)
         mov             rcx,msjIngFilCol
         sub             rsp,32
@@ -89,14 +100,15 @@ main:
         call            validarFyC ;vamos a validar que la fila y la columna esten en el rango deseado
         ;colocando una letra dentro la var reservada parea eso en la subrutina
         ;comparamos el contenido del input del usuario contra las letra q metimos en la subrutina.                                
-        cmp             [inputValido], "N" ; el contenido de inputValido
+        cmp             word[inputValido], "N" ; el contenido de inputValido
         ;si me encuentro una letra N en inputValido es que el ingreso del usuario no era valido
         je              ingresoDatos ; entonces bifurco al rotulo ingresoDatos y pido todo de vuelta
-        
+
+        ;je              main; es lo mismo
         ;pareceria q conviene meter solo los rotulos y dsps escribir el codigo de ellos
 
         ;si los datos son validos, subrutina para calcular desplazamiento
-        call            calDesplaz
+        call            calcDesplaz
         
         ;subrutina para calcular sumatoria de elementos de la fila dde col dada
         call            calcSumatoria
@@ -140,12 +152,12 @@ validarFyC:
         mov             r8,fila ;xa guardar el valor de la fila
         mov             r9,columna ;xa guardar el valor de la columna
         sub             rsp,32
-        call            sscanf ;nos devuelve la cant de resultados casteados exitosamente en el rax. 
+        call            sscanf ;nos devuelve la cant de numeros casteados exitosamente en el RAX.
         ;Sirve como validacion fisica de que no se hayan ingresado letras o chars especiales porque castea a enteros 
         add             rsp,32
 
         ;chequeo q haya casteados los 2 valores enteros ( por ej 3 E daria 1)
-        cmp             rax,2 
+        cmp             rax,2 ;
         jl              invalido
         
         ;Chequeo q la fila y la columna esten en el rango 1 a 5 validacion logica x rango
@@ -159,16 +171,69 @@ validarFyC:
         jl              invalido
         cmp             word[columna],5
         jg              invalido
+
+        mov             byte[inputValido], "S";pongo una S para dar el okey de q se ingreso bien
         
         ;N:B todas las funciones externas devuelven algo por el registro rax, asi q cuidado porque puede
         ;pisar cosas
 
 invalido:
         
+        ret
+
+calcDesplaz:
+        ;Suponiendo que el indice arranca en 1
+        ;calculo de desplaza hasta llegar (fila, col) de la matriz
+        ;[(fila - 1) *LongFila] = [(columna -1)*LongElemento]
+        ;longFila = longElemento * CantDeColumnas
+
+        ;desplazamiento fila
+        mov             bx,word[fila] ;
+        sub             bx,1 ;restamos 1 porque el indice empieza en 1
+        imul            bx,bx,10 ;(fila -1)*Longfila = (fila -1) *2bytes (word) *5 
+        ;dejo en bx, desplazamiento de la fila
+        ;guardo momentaneamente el desplazamiento en desplaz xa poder seguir usando bx
+        mov             word[desplaz], bx
+        
+        ;desplazamiento columna
+        mov             bx,word[columna]
+        sub             bx,1
+        imul            bx,bx,2 ;word = 2 bytes 
+        ;dejo en bx el desplazamiento de la columna
+        
+        ;sumo los desplazamientos
+        add             word[desplaz],bx ;en desplaz tengo el desplazamiento total
 
         ret
 
-CalcDesplaz:
+calcSumatoria:
         
+        mov     dword[sumatoria],0 ;inicializo en 0 la variable sumatoria xa q no tenga basura
+        
+        ;loop labura con el registro RCX (counter xd)
+        mov     rcx,0
+        mov     cx,6 ;(columnas_totales(5) + 1) = 6 (_*RCX*_)
+        sub     cx,word[columna] ;  - columna_elegida. y lo guardo en RCX que hace de contador
+        
+        ;uso RBX de puntero (Base) para guardar el desplaz
+        mov     rbx,0 ;relleno con 0's y uso BX de puntero indice
+        mov     bx,word[desplaz] ;copio el desplaz a ese registro xa marcar el inicio.
+        ;desplaz tiene la cant de bytes a saltear xa llegar a la pos indicada por la fila y columna
+
+sumarSgte: ;(_*RCX*_)
+        ;uso AX para levantar cada elemento de la matriz q son de tipo word
+        mov     rax,0 ;inicializo RAX en 0 para asegurarme que lo q viene antes de ax no tiene basura.
+        ;le sumo a la direc inicial de la matriz los bytes para llegar a la pos i j
+        ;y luego guardo el [CONTENIDO] de esa "pos de mem" n la q estoy parado
+        mov     ax,word[matriz + rbx] 
+
+        ;como dije q iba a guardar el resultado de la suma en una dobleWord, uso eax
+        add     dword[sumatoria],eax ;con eso hice la 1era (N'ava) suma parcial
+
+        ; sumo 2 (Bytes) al puntero q uso de indice debido a q es una matriz con elementos doubleWords d 2 Bytes
+        add     rbx,2
+        
+        ;(_*RCX*_)
+        loop sumarSgte ;loop hace rcx - 1 , compara y si es = a 0 sigue de largo, sino otra vuelta
 
         ret

@@ -28,6 +28,8 @@
 global main
 extern printf
 extern puts
+extern sscanf ;interpreta una cadena de texto segun los calificadores q puse en la cadena
+;xa eso usamos la variable FormatInputFilCol
 extern gets
 
 section     .data   ;variables con valores predefinidos (repaso jeje)
@@ -48,6 +50,7 @@ section     .data   ;variables con valores predefinidos (repaso jeje)
         ;10 = \n 13 = "retorno de carro, pone cursor al inicio de la linea" 0 = "corta el printf" 
         msjIngFilCol        db "Ingrese fila (1 a 5) y columna (1 a 5): ",10,0 ;recordar 10 para \n y 0 para cortar el printf o puts 
         formatInputFilCol   db "%hi %hi",0 ;hi (16 bits, 2 bytes 1 word)
+        ;esto es para el sscanf
 
         msjSumatorial       db "La sumatoria es : %i",10,0 ; %i 32 bits (doble plbra dword dd)
 
@@ -65,7 +68,7 @@ section     .bss
         sumatoria       resd    1 ;rserve 4 bytes por si la sumatoria llega  dar muy grande
 
         inputFilCol     resb    50;"para el texto por teclado, en este caso, fila y col"
-        ;como gets es un funcion insegura siempre la defino como ult variable en el campo bss
+        ;como gets (y sscanf???) es un funcion insegura siempre la defino como ult variable en el campo bss
         ;y siempre le defino espacio de mas para que no sobrepase el tamanio
 
 section     .text
@@ -80,7 +83,7 @@ main:
         ;pido fila y col (rcx la variable donde guardo)
         mov             rcx,inputFilCol
         sub             rsp,32
-        call            gets
+        call            gets ;solo lee lo ingresado como texto. No castea nada
         add             rsp,32
 
         call            validarFyC ;vamos a validar que la fila y la columna esten en el rango deseado
@@ -92,8 +95,9 @@ main:
         
         ;pareceria q conviene meter solo los rotulos y dsps escribir el codigo de ellos
 
-        ;subrutina para calcular desplazamiento
+        ;si los datos son validos, subrutina para calcular desplazamiento
         call            calDesplaz
+        
         ;subrutina para calcular sumatoria de elementos de la fila dde col dada
         call            calcSumatoria
         
@@ -127,3 +131,44 @@ ret
 ;RUTINAS INTERNAS
 ;*************************************
 validarFyC:
+        ;Esperamos valores del tipo "[1..5] [1..5]" para Fila - Columna
+        mov             byte[inputValido], "N"; Le coloco un no a la var. es como un false antes del ciclo
+
+        ; voy a usar 4 parametros para sscanf
+        mov             rcx,inputFilCol; tomado el ingreso por teclado fuere cual fuere
+        mov             rdx,formatInputFilCol; formatea el ingreso como lo escribi
+        mov             r8,fila ;xa guardar el valor de la fila
+        mov             r9,columna ;xa guardar el valor de la columna
+        sub             rsp,32
+        call            sscanf ;nos devuelve la cant de resultados casteados exitosamente en el rax. 
+        ;Sirve como validacion fisica de que no se hayan ingresado letras o chars especiales porque castea a enteros 
+        add             rsp,32
+
+        ;chequeo q haya casteados los 2 valores enteros ( por ej 3 E daria 1)
+        cmp             rax,2 
+        jl              invalido
+        
+        ;Chequeo q la fila y la columna esten en el rango 1 a 5 validacion logica x rango
+        ;la fila
+        cmp             word[fila],1
+        jl              invalido
+        cmp             word[fila],5
+        jg              invalido
+        ;chequeo la columna
+        cmp             word[columna],1
+        jl              invalido
+        cmp             word[columna],5
+        jg              invalido
+        
+        ;N:B todas las funciones externas devuelven algo por el registro rax, asi q cuidado porque puede
+        ;pisar cosas
+
+invalido:
+        
+
+        ret
+
+CalcDesplaz:
+        
+
+        ret

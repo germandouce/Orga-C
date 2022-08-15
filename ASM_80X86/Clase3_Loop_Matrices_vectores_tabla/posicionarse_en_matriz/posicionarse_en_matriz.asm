@@ -54,7 +54,9 @@ main:
 
     ;Muestro por pantalla el dato accediendo a la matriz sabiendo que en ebx quedo la direc del dato
     mov     rcx, mensaje1
-    mov		rdx,[ebx]
+    mov    rdx,0 ;para completar 0's a izq del regsitro y q no quede con basura
+    mov     edx, [ebx]
+    ;mov	rdx,[ebx] ; probar con edx y agregar dword
 
     sub     rsp,32
     call    printf

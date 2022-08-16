@@ -156,7 +156,7 @@ validarFyC:
         ;Sirve como validacion fisica de que no se hayan ingresado letras o chars especiales porque castea a enteros 
         add             rsp,32
 
-        ;chequeo q haya casteados los 2 valores enteros ( por ej 3 E daria 1)
+        ;chequeo q haya casteado los 2 valores enteros ( por ej 3 E daria 1)
         cmp             rax,2 ;
         jl              invalido
         

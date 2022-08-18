@@ -37,7 +37,6 @@ main:
 
     mov        qword[idArchivo], rax ; guardo en una var en memoria el file pointer hasta que cierre el archivo
     
-    ; NO FUNCIONAAAAAAAA!!!!
     ;lectura del archivo
     mov     rcx, registro
     mov     rdx,22 ;cantidad de bytes que levanta el archivo. 
@@ -52,11 +51,11 @@ main:
     call    fread
     add     rsp,32
 
+    ;escritura del archivo
     mov     rcx, registro ;el contenido quedo en registro, lo vuelvo a mover a rcx
     ;DUDA
     ;mov     rcx, id ;imprime todo no se xq
     ;mov     rcx, nombre ;imprime a partir del 3er byte
-    
     sub     rsp,32
     call    puts
     add     rsp,32

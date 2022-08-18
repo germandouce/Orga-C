@@ -14,7 +14,7 @@ section .data
 
 section .bss
 
-    idArchivo       resq    1 ;para guardar durante el programa el file-pointer (o handler)
+    idArchivo       resq    1 ;para guardar durante el programa el file-pointer (o handler). son 64 bits.
     registro        resb    81 ;buffer en memoria para que cada invocacion a la funcion nos copia el contenido del archivo aca
 
 section .text
@@ -27,8 +27,8 @@ main:
     call        fopen
     add         rsp,32
 
-    cmp        rax,0
-    jle        errorOpen
+    cmp        rax,0 ;deja en el rax la direccion del resgutrro o un codigo de error, es decir   
+    jle        errorOpen ; el error es si es negativo o cero
 
     mov         qword[idArchivo], rax ; guardo en una var en memoria el file pointer hasta que cierre el archivo
     

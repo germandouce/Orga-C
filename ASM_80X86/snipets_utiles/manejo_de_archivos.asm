@@ -14,19 +14,20 @@ section .data
     ;r+: Opens file in r & w mode. File pointer starts at BEGINNING of the file.
     ;w+: Opens file in r & w mode. Creates a new file if it does not exist, 
     ;    if it exists, it ERASES CONTENT and the file pointer starts from the BEGINNING
-    linea                   db      "escribo esto: 9557/7503",0 ;linea que quiero escribir en el archivo
+    linea                   db      "9557/7503",0 ;linea que quiero escribir en el archivo
     mensaje_error_open      db      "No se pudo abrir el archivo",0
     mensaje_error_read      db      "No se pudo leer el archivo o esta vacio",0
     mensaje_error_close     db      "Ocurrio un problema al intentar cerrar el archivo",0
     mensaje_mal_escrito     db      "No se pudo escribir correctamente el archivo",0
     mensaje_bien_escrito    db      "se escribio correctamente el archivo",0
     mensaje_correcto_cierre db      "se cerro bien el archivo",0
-    debug                   db      "debug"
+    mensaje_lectura         db      "El archivo venia escrito con el siguiente contenido:",0  
 
 section .bss
 
-    idArchivo       resq    1 ; para guardar el file-pointer (o handler)
-    registro        resb    24 ;buffer en memoria para que cada invocacion a la funcion nos copia el contenido del archivo aca
+    idArchivo           resq    1 ; para guardar el file-pointer (o handler)
+    registro            resb    24 ;buffer en memoria para que cada invocacion a la funcion nos copia el contenido del archivo aca
+    apertura_correcta   resb    2; "S" si se abre bien "N", en caso contrario
 
 section .text
 main:
@@ -35,7 +36,8 @@ main:
 
     call    apertura
 
-    call    cierre
+    cmp     word[apertura_correcta],"S" ;s abrio bien? 
+    je      cierre ;solo cierro el archivo si efectivamente se abrio
 
 ret
 
@@ -52,6 +54,7 @@ apertura:
 
     cmp         rax,0 ; en RAX queda el handle / IdArchivo, el puntero
     jg          lectura
+    mov         word[apertura_correcta],"N"
     jmp         error_open ;error si es 0 (no leyo nada) o < 0 (error)
 
     ret
@@ -60,6 +63,7 @@ lectura:
     ;lectura del archivo
     ;fgets (    RCX                     ,     RDX      ,     R8      )
     ;fgets ( registro(contenidoArchivo) ,  BytesALeer  ,  FilePointer)
+    mov         word[apertura_correcta],"S"
     
     mov     qword[idArchivo], rax ; guardo en una var en memoria el FilePointer hasta que cierre el archivo
 
@@ -78,10 +82,10 @@ lectura:
     ;imprimo por pantalla el contenido del archivo. OJO VER MODE. W+ deletes the content !
     
     ;esto solo corre si leo. si escribo, jle, bifurca y al volver salta directo al ret y de ahi a cierre
-    ;mov         rcx, debug
-    ;sub         rsp,32
-    ;call        puts
-    ;add         rsp,32
+    mov         rcx, mensaje_lectura
+    sub         rsp,32
+    call        puts
+    add         rsp,32
     
     mov     rcx, registro ;el contenido quedo en registro, lo vuelvo a mover a RCX
     sub     rsp,32

@@ -155,3 +155,8 @@ sumarSgte: ;(_*RCX*_)
         loop sumarSgte ;loop hace rcx - 1 , compara y si es = a 0 sigue de largo, sino otra vuelta
 
         ret
+
+;____________Manejo de archivos externo txt_______________
+;Claves/ resumen/ cosas que no me acuerdo? 
+;q mas agrego aca??
+

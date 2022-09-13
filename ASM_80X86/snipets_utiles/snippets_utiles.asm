@@ -1,3 +1,10 @@
+; casi siempre se usan
+global main
+extern printf
+extern puts
+extern sscanf ;interpreta una cadena de texto segun los calificadores q puse en la cadena
+;xa eso usamos la variable FormatInputFilCol
+extern gets
 
 ;_____________impresion por pantalla de un string solito__________________
 section .data

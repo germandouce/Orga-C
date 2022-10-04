@@ -177,7 +177,7 @@ leerRegistro:
     rep         movsb
 
     mov         rcx, precioStr ;lo parseo a BPF C/s de 32 bits
-    mov         rsi, precioFormat
+    mov         rdx, precioFormat
     mov         r8, precioSel ; en la var q dsps se copia al archivo
     
     sub         rsp,32

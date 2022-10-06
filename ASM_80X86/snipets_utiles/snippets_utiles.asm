@@ -1,10 +1,97 @@
 ; casi siempre se usan
-global main
-extern printf
+global 	main
 extern puts
-extern sscanf ;interpreta una cadena de texto segun los calificadores q puse en la cadena
-;xa eso usamos la variable FormatInputFilCol
-extern gets
+extern 	printf
+extern	gets
+extern 	sscanf
+extern	fopen
+extern	fread
+extern	fclose
+
+;____________________secciones___________________
+section .data
+
+section .bss
+
+section .text 
+main: 
+
+
+;__________________Abrir archivo___________________
+
+    call	abrirArhivo
+
+	cmp		qword[fileHandle],0				;Error en apertura?
+	jle		errorOpen
+
+	call	leerArchivo
+	call	listar
+
+endProg:
+
+	ret
+
+errorOpen:
+    mov		rcx, msgErrOpen
+	sub		rsp,32
+	call	printf
+	add		rsp,32
+
+    jmp		endProg
+
+leerArchivo:
+
+abrirArchivo:
+;	Abro archivo para lectura
+	mov		rcx, nombreArchivo	    ;Parametro 1: dir nombre del archivo
+	mov		rdx, modoApertura				;Parametro 2: dir string modo de apertura
+	sub		rsp,32
+	call	fopen					;ABRE el archivo y deja el handle en RAX
+	add		rsp,32
+
+	mov		qword[nombreArchivoHandle],rax
+
+	ret
+;______________Leer registro binario_____________
+
+leerRegistro:
+
+        mov		rcx,registro				  ;Parametro 1: dir area de memoria donde se copia
+        mov		rdx, 23     				  ;Parametro 2: longitud del registro
+        mov		r8,1						  ;Parametro 3: cantidad de registros
+        mov		r9,qword[nombreArchivoHandle] ;Parametro 4: handle del archivo
+        sub		rsp,32
+        call	fread						;LEO registro. Devuelve en rax la cantidad de bytes leidos
+        add		rsp,32
+
+        cmp		rax,0				        ;Fin de archivo?
+        jle		closeFiles
+
+        call    VAL_CONSIGNA
+
+        cmp		byte[esValido],'S'
+        jne		leerReg
+        
+        ;EN ESTE ESPACIO VA LA LLAMADA A LA RUTINA QUE AGARRA EL REGISTRO Y LO PROCESA 
+        ;Luego se salta al siguiente registro
+
+        ; Actualizar la actividad leida del archivo en la matriz
+        call	OperacionConMatriz
+
+	jmp		leerReg ;Leo el prox registro
+
+
+;________________CloseFiles___________________________
+closeFiles:
+
+    mov     rcx,qword[handleSeleccion]
+    sub     rsp,32
+    call    fclose
+    add     rsp,32
+
+
+;___________________VALIDACIONES_________________________
+
 
 ;_____________impresion por pantalla de un string solito__________________
 section .data
@@ -28,9 +115,10 @@ sumatoria           resd    1
 
 
 section .text
-    mov             rcx,msjSumatoria
+    mov             rcx,msjSumatoria    ;parametro 1), el string con el texto
     ;mov             edx,dword[sumatoria] ;esto tiraria error xq rdx es de 64 bits y sumatoria era de 32 bit
-    mov             rdx,0 ; ;para asegurarme que en los bits superiores del rdx haya ceros
+    mov             rdx,0 ; parametro 2); el numero a formatear en %i con el tam q corresponda
+    ;para asegurarme que en los bits superiores del rdx haya ceros
     mov             edx,dword[sumatoria]; poner el dword ya que estoy fromateando un numero de menos de 64 bits
     sub             rsp,32
     call            printf
@@ -41,6 +129,9 @@ section .text
 section .data
 
     formatInputFilCol   db "%hi %hi",0 ;hi (16 bits, 2 bytes 1 word).         ;esto es para el sscanf
+
+section .bss
+    
     inputFilCol         resb    50 ; para que me sobre y siempre al FINAL DE LA SECCION
 
 section .text
@@ -89,8 +180,14 @@ validarFyC:
 
     mov             byte[inputValido], "S" ;pongo una S para dar el okey de q se ingreso bien
 
+    invalido:
+        ret
+
 ;_____________Rutina para calcular desplazamiento en una matriz_________________
 calcDesplaz:
+;#FALTA 
+;Ver si conviene esta o la del pptx!!!!
+
     ;Suponiendo que el indice arranca en 1
     ;calculo de desplaza hasta llegar (fila, col) de la matriz
     ;[(fila - 1) * LongFila] = [ (columna -1) * LongElemento]    con longFila = longElemento * CantDeColumnas

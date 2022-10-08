@@ -25,7 +25,7 @@ main:
 	jle		errorOpen
 
 	call	leerArchivo
-	call	listar
+	call	#operacionConPedidoAlUsuario
 
 endProg:
 
@@ -39,58 +39,239 @@ errorOpen:
 
     jmp		endProg
 
+
+;Abro archivo para lectura
+abrirArchivo:
+    
+    mov		rcx, #nombreArchivo	    ;Parametro 1: dir nombre del archivo
+    mov		rdx, #modoApertura				;Parametro 2: dir string modo de apertura
+    sub		rsp,32
+    call	fopen					;ABRE el archivo y deja el handle en RAX
+    add		rsp,32
+
+    mov		qword[#nombreArchivoHandle],rax ; lo dejamos en fileHandle
+
+    ret
+
+
 leerArchivo:
 
-abrirArchivo:
-;	Abro archivo para lectura
-	mov		rcx, nombreArchivo	    ;Parametro 1: dir nombre del archivo
-	mov		rdx, modoApertura				;Parametro 2: dir string modo de apertura
-	sub		rsp,32
-	call	fopen					;ABRE el archivo y deja el handle en RAX
-	add		rsp,32
+    ;______________Leer registro binario_____________
+    leerRegistro:
 
-	mov		qword[nombreArchivoHandle],rax
+            mov		rcx,registro		    ;Parametro 1: dir area de memoria donde se copia
+            mov		rdx, 23     				  ;Parametro 2: longitud del registro
+            mov		r8,1						  ;Parametro 3: cantidad de registros
+            mov		r9,qword[#nombreArchivoHandle] ;Parametro 4: handle del archivo
+            sub		rsp,32
+            call	fread						;LEO registro. Devuelve en rax la cantidad de bytes leidos
+            add		rsp,32
 
-	ret
-;______________Leer registro binario_____________
+            cmp		rax,0				        ;Fin de archivo?
+            jle		eof                  ;salto cuando en el rax hay 0, osea fread llego a eof
 
-leerRegistro:
+            call    #VAL_CONSIGNA    ;VALIDACIONES
 
-        mov		rcx,registro				  ;Parametro 1: dir area de memoria donde se copia
-        mov		rdx, 23     				  ;Parametro 2: longitud del registro
-        mov		r8,1						  ;Parametro 3: cantidad de registros
-        mov		r9,qword[nombreArchivoHandle] ;Parametro 4: handle del archivo
-        sub		rsp,32
-        call	fread						;LEO registro. Devuelve en rax la cantidad de bytes leidos
-        add		rsp,32
+            cmp		byte[RegEsValido],'S'
+            jne		leerReg ;para que no llegue al eof. Iteri hasta el ult rotulo
+            
+            ;el regsitro es valido...
+            ;EN ESTE ESPACIO VA LA LLAMADA A LA RUTINA QUE AGARRA EL REGISTRO Y LO PROCESA 
+            ;Luego se salta al siguiente registro
 
-        cmp		rax,0				        ;Fin de archivo?
-        jle		closeFiles
+            ; Actualizar la actividad leida del archivo en la matriz
+            call	#operacionConMatriz
 
-        call    VAL_CONSIGNA
-
-        cmp		byte[esValido],'S'
-        jne		leerReg
-        
-        ;EN ESTE ESPACIO VA LA LLAMADA A LA RUTINA QUE AGARRA EL REGISTRO Y LO PROCESA 
-        ;Luego se salta al siguiente registro
-
-        ; Actualizar la actividad leida del archivo en la matriz
-        call	OperacionConMatriz
-
-	jmp		leerReg ;Leo el prox registro
+        jmp		leerReg ;Leo el prox registro
 
 
-;________________CloseFiles___________________________
-closeFiles:
+    ;________________CloseFiles___________________________
+    eof:
+        ;cierro archivos    
+        mov     rcx,qword[handleSeleccion]
+        sub     rsp,32
+        call    fclose
+        add     rsp,32
 
-    mov     rcx,qword[handleSeleccion]
-    sub     rsp,32
-    call    fclose
-    add     rsp,32
+    ret ;finalizo rutina leerArchivo
 
 
 ;___________________VALIDACIONES_________________________
+VAL_CONSIGNA:
+
+    ;_______Validacion por TABLA de #dato_1_AValidar_______
+    mov     rbx,0   ;Utilizo rbx como puntero al vector #tablaDeValidacion
+    mov     rcx,7   ;Longitud de vector #tablaDeValidacion. Para la loop
+    mov     rax,0   ;#ConteoDias dato convertido en num bin. Arranca en 0 
+
+    compDatoAValidar:
+        
+            ;#ConteoDias
+            inc     rax ; sumo 1 al dato convertido en binario (ver datoAValidarPorTablaEsValido)
+            ;para moverme de columna en el vector q venia en chars. Sig dia
+
+            ;push    rcx,2
+            
+            mov		qword[contadorLoopValidacion],rcx	;Resguardo el rcx en un contador porque se va usar para cmpsb
+            ;para CMPSB
+            mov     rcx,2                               ;1) bytes de #dato_1_AValidar
+            lea     rsi,[#datoAValidarPorTabla]         ;2) #dia origen -> rsi
+            lea     rdi,[#tablaDeValidacion + rbx]      ;3) #tabla de dias destino -> rdi
+            repe    cmpsb                               ;funciona con 3 registros
+            
+            mov		rcx,qword[contadorLoopValidacion]			;Recupero el rcx para el loop
+            
+            ;pop     rcx,2
+            je      #datoAValidarPorTablaEsValido
+            add		rbx,2	    ;Avanzo en el vector #tablaDeValidacion el tam de datoAValidarPorTabla
+
+        loop    #compDatoAValidar
+
+        ;fin ciclo iteraciones de valores del vector #tablaDeValidacion
+	    jmp     invalido
+
+    ;_______Validacion por RANGO de #dato_2_AValidar_______
+    datoAValidarPorTablaEsValido
+        
+        ;solo el dia era valido,
+        ;#conteoDias
+        mov		byte[datoBin],al	;Paso el dia en binario a una variable [datoBin]
+        ;uso el al porque es solo 1 byte el dia e bpf. El conteo lo hago yo a mano!
+
+        cmp		byte[#datoAValidarPorRango],1
+        jl		invalido
+        cmp		byte[#datoAValidarPorRango],6
+        jg		invalido
+
+    valido:
+	    mov		byte[RegEsValido],'S'			;Devuelve S en la variable esValid si es un reg válido
+        jmp		finValidar
+
+    invalido:
+        mov		byte[RegEsValido],"N"			;Coloco "N" en la variable RegEsValido si no es un reg valido    
+
+    finValidar:
+	    ret
+
+operacionConMatriz:
+    ;El problema en este ejercicio es q en las columnas no tengo numeros de dias sino
+    ;dias con characteres Lu Ma etc, y necesito un valor numerico!
+    ;Aprovecho el loop de validacion para convertir
+
+    ; deplazamiento de una matriz
+	; (col - 1) * L + (fil - 1) * L * cant. cols
+	; [Deplaz. Cols] + [Desplaz. Filas]
+
+    mov		rax,0
+	mov		rbx,0   ; x las dudas de q el rbx tenga basura
+
+    
+	sub		byte[diabin],1				;(col - 1)
+    mov		al,byte[diabin]				;al = (col - 1)
+	
+	mov		bl,2			            ;bl = L
+    mul		bl				            ;ax = ax * bl = (col - 1) * L
+    
+	mov		rdx,rax			            ;rdx = ColsDesplaz 
+
+	sub		byte[semana],1	            ;(fila -1)
+	mov		al,byte[semana]             ;al = (fila -1)
+    mov		bl,14			            ;bl = (L * cant.cols)
+	mul		bl	            ;ax = FilsDesplaz = = ax * bl = (fila - 1) * L * Cant.Cols
+
+	add		rax,rdx			;rax = DesplazTotal = ColsDesplaz + FilsDesplaz
+
+	mov		bx,word[matriz + rax]	;obtengo el valor la matriz
+	inc		bx						;#OJO sumar 1 x consigna
+	mov		word[matriz + rax],bx	;volver a actualizar valor en matriz
+
+    ;inc     word[matriz + rax] ;otra opcion #OJO
+
+    ret
+        
+
+operacionConPedidoAlUsuario:
+
+    ingresoDatosUsuario:
+            mov		rcx,#msjOperacionPedidoAlUsuario		;Parametro 1: direccion del mensaje a imprimir
+            sub		rsp,32
+            call	printf
+            add		rsp,32
+
+            mov		rcx,#inputUsuario    ;Parametro 1: direccion de memoria del campo donde se guarda lo ingresado
+            sub		rsp,32
+            call	gets				;Lee de teclado y lo guarda como string hasta que se ingresa fin de linea . Agrega un 0 binario al final
+            add		rsp,32
+
+            mov		rcx,#datoInputUsuario    ;Parametro 1: campo donde están los datos a leer
+            mov		rdx,#formatInputUsario   ;Parametro 2: dir del string q contiene los formatos
+            mov		r8,#datoInputUsuario     ;Parametro 3: dir del campo que recibirá el dato formateado
+            sub		rsp,32
+            call	sscanf                  ;chequeo que no haya ingreado chars especiales o letras
+            add		rsp,32
+
+            cmp		rax,1			;rax tiene la cantidad de campos que formateo bien 
+        
+        jl		#ingresoDatosUsuario
+
+        ;___Validacion por RANGO ingreso Datos Usuario___
+        cmp		dword[#datoInputUsuario],1  ;minimo
+        jl		#ingresoDatosUsuario
+        cmp		dword[#datoInputUsuario],6  ;maximo
+        jg		#ingresoDatosUsuario
+        
+
+         ; deplazamiento de una matriz
+	    ; (col - 1) * L + (fil - 1) * L * cant. cols
+	    ; [Deplaz. Cols] + [Desplaz. Filas]
+        ;ya tengo el nro ingresado [1..6] en binario (double word 4 bytes)
+        sub		dword[#datoInputUsuario],1 ;desplaz. filas (fila - 1)
+
+        mov		rax,0
+        mov     eax,dword[#datoInputUsuario] ;eax = (fila - 1)
+
+        mov		bl,14			; bl = (L * Cant.Cols)
+        mul		bl				;ax = FilasDeplaz = eax * bl = (fila - 1) * (L * Cant.Cols)
+
+        mov		rdi,rax			;rdi = FilasDesplaz
+
+        ;#HASTA AQUI 07/10/22 min 2h 32 video
+
+        mov		rcx,msgEnc			;Parametro 1: direccion de memoria del campo a imprimir
+        sub		rsp,32
+        call	printf				;Muestro encabezado del listado por pantalla
+        add		rsp,32
+
+        mov		rcx,7
+        mov		rsi,0			;Utilizo rsi para desplazar dentro del vector diasImp
+        mov		rbx,0			;Utilizo rbx como auxiliar para levantar cant. total actividades
+    
+    mostrar:    
+        mov		qword[contador],rcx
+
+        lea     rcx,[diasImp + rsi]
+        sub		rsp,32
+        call	printf
+        add		rsp,32
+
+        mov		bx,word[matriz + rdi]		; recupero la cantidad total de actividades en el dia de la matriz
+
+        mov		rcx,msgCant		;Parametro 1: direccion de memoria de la cadena texto a imprimir
+        mov		rdx,rbx			;Parametro 2: campo que se encuentra en el formato indicado q se imprime por pantalla
+        sub		rsp,32
+        call	printf
+        add		rsp,32
+
+        add		rdi,2			;Avanzo al próximo elemento de la fila (cada elem. es una WORD de 2 bytes)
+        add		rsi,15			;Avanzo 14 + 1 bytes (1 byte de caract. especial 0 al final de cada dia)
+
+        mov		rcx,qword[contador]
+        loop	mostrar
+
+        ret
+
+
+
 
 
 ;_____________impresion por pantalla de un string solito__________________

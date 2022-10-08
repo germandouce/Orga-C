@@ -80,7 +80,7 @@ leerArchivo:
             ;Luego se salta al siguiente registro
 
             ; Actualizar la actividad leida del archivo en la matriz
-            call	#operacionConMatriz
+            call	#operacionConMatrizDada
 
         jmp		leerReg ;Leo el prox registro
 
@@ -110,18 +110,18 @@ VAL_CONSIGNA:
             inc     rax ; sumo 1 al dato convertido en binario (ver datoAValidarPorTablaEsValido)
             ;para moverme de columna en el vector q venia en chars. Sig dia
 
-            ;push    rcx,2
+            ;push    rcx,2 
+            mov		qword[contadorTransitorioRcx],rcx	;Resguardo el rcx en un contador porque se va usar para cmpsb
             
-            mov		qword[contadorLoopValidacion],rcx	;Resguardo el rcx en un contador porque se va usar para cmpsb
             ;para CMPSB
             mov     rcx,2                               ;1) bytes de #dato_1_AValidar
             lea     rsi,[#datoAValidarPorTabla]         ;2) #dia origen -> rsi
             lea     rdi,[#tablaDeValidacion + rbx]      ;3) #tabla de dias destino -> rdi
             repe    cmpsb                               ;funciona con 3 registros
             
-            mov		rcx,qword[contadorLoopValidacion]			;Recupero el rcx para el loop
-            
+            mov		rcx,qword[contadorTransitorioRcx]			;Recupero el rcx para el loop
             ;pop     rcx,2
+
             je      #datoAValidarPorTablaEsValido
             add		rbx,2	    ;Avanzo en el vector #tablaDeValidacion el tam de datoAValidarPorTabla
 
@@ -153,12 +153,12 @@ VAL_CONSIGNA:
     finValidar:
 	    ret
 
-operacionConMatriz:
+operacionConMatrizDada:
     ;El problema en este ejercicio es q en las columnas no tengo numeros de dias sino
     ;dias con characteres Lu Ma etc, y necesito un valor numerico!
     ;Aprovecho el loop de validacion para convertir
 
-    ; deplazamiento de una matriz
+    ; deplazamiento de una #matrizDada
 	; (col - 1) * L + (fil - 1) * L * cant. cols
 	; [Deplaz. Cols] + [Desplaz. Filas]
 
@@ -166,26 +166,26 @@ operacionConMatriz:
 	mov		rbx,0   ; x las dudas de q el rbx tenga basura
 
     
-	sub		byte[diabin],1				;(col - 1)
-    mov		al,byte[diabin]				;al = (col - 1)
+	sub		byte[#datoBin],1				;(col - 1)
+    mov		al,byte[#datoBin]				;al = (col - 1)
 	
 	mov		bl,2			            ;bl = L
     mul		bl				            ;ax = ax * bl = (col - 1) * L
     
 	mov		rdx,rax			            ;rdx = ColsDesplaz 
 
-	sub		byte[semana],1	            ;(fila -1)
-	mov		al,byte[semana]             ;al = (fila -1)
+	sub		byte[#datoAValidarPorRango],1	            ;(fila -1)
+	mov		al,byte[#datoAValidarPorRango]             ;al = (fila -1)
     mov		bl,14			            ;bl = (L * cant.cols)
 	mul		bl	            ;ax = FilsDesplaz = = ax * bl = (fila - 1) * L * Cant.Cols
 
 	add		rax,rdx			;rax = DesplazTotal = ColsDesplaz + FilsDesplaz
 
-	mov		bx,word[matriz + rax]	;obtengo el valor la matriz
+	mov		bx,word[#matrizDada + rax]	;obtengo el valor la matrizDada
 	inc		bx						;#OJO sumar 1 x consigna
-	mov		word[matriz + rax],bx	;volver a actualizar valor en matriz
+	mov		word[#matrizDada + rax],bx	;volver a actualizar valor en matrizDada
 
-    ;inc     word[matriz + rax] ;otra opcion #OJO
+    ;inc     word[#matrizDada + rax] ;otra opcion #OJO
 
     ret
         
@@ -193,7 +193,7 @@ operacionConMatriz:
 operacionConPedidoAlUsuario:
 
     ingresoDatosUsuario:
-            mov		rcx,#msjOperacionPedidoAlUsuario		;Parametro 1: direccion del mensaje a imprimir
+            mov		rcx,#msjOperacionPedidoAlUsuario    ;Parametro 1: direccion del mensaje a imprimir
             sub		rsp,32
             call	printf
             add		rsp,32
@@ -214,17 +214,19 @@ operacionConPedidoAlUsuario:
         
         jl		#ingresoDatosUsuario
 
-        ;___Validacion por RANGO ingreso Datos Usuario___
+    ;___Validacion por RANGO ingreso Datos Usuario___
         cmp		dword[#datoInputUsuario],1  ;minimo
         jl		#ingresoDatosUsuario
         cmp		dword[#datoInputUsuario],6  ;maximo
         jg		#ingresoDatosUsuario
         
 
-         ; deplazamiento de una matriz
-	    ; (col - 1) * L + (fil - 1) * L * cant. cols
-	    ; [Deplaz. Cols] + [Desplaz. Filas]
-        ;ya tengo el nro ingresado [1..6] en binario (double word 4 bytes)
+    ;_____ Desplazamiento en #matrizDada operacion usuario _____
+    ;_____ #EN ESTE CASO CORRESPONDE A UN DESPLZAMIENTO EN FILAS, 
+    ;______EL USUSAIRO ELIJE UN FILA = UNA SEMANA. Luego itero sobre cols xa esa fila
+    ; (col - 1) * L + (fil - 1) * L * cant. cols
+    ; [Deplaz. Cols] + [Desplaz. Filas]
+    ;ya tengo el nro ingresado [1..6] en binario (double word 4 bytes)
         sub		dword[#datoInputUsuario],1 ;desplaz. filas (fila - 1)
 
         mov		rax,0
@@ -233,42 +235,49 @@ operacionConPedidoAlUsuario:
         mov		bl,14			; bl = (L * Cant.Cols)
         mul		bl				;ax = FilasDeplaz = eax * bl = (fila - 1) * (L * Cant.Cols)
 
-        mov		rdi,rax			;rdi = FilasDesplaz
+        mov		rdi,rax			;RDI = FilasDesplaz 
+        ;xq  el retorno de printf puedo llegar a pisar el rax
 
-        ;#HASTA AQUI 07/10/22 min 2h 32 video
-
-        mov		rcx,msgEnc			;Parametro 1: direccion de memoria del campo a imprimir
+    ;____#msgDescriptivoOperUser_____
+        mov		rcx,#msgDescriptivoOperUser	
         sub		rsp,32
-        call	printf				;Muestro encabezado del listado por pantalla
+        call	printf				;Muestro texto descruptivo al usuario
         add		rsp,32
 
-        mov		rcx,7
-        mov		rsi,0			;Utilizo rsi para desplazar dentro del vector diasImp
-        mov		rbx,0			;Utilizo rbx como auxiliar para levantar cant. total actividades
+    ;___ impresin de listado indicando tablaImpresion___.
+        mov		rcx,7           ;(long tablaImp) = Cantidad de filas/cols sobre las q voy a iterar
+        mov		rsi,0			;Utilizo rsi para moverme en el vector tablaImp
+        mov		rbx,0			;RBX en 0 para no tener basura y levantar valor de cada pos de la tabla. 
     
-    mostrar:    
-        mov		qword[contador],rcx
+    imprimir:    
+            mov		qword[contadorTransitorioRcx],rcx ;xq con el printf piso el rcx
 
-        lea     rcx,[diasImp + rsi]
-        sub		rsp,32
-        call	printf
-        add		rsp,32
+            ;___Imprimo la lyenda de #tablaImp___
+            lea     rcx,[#tablaImp + rsi] ;le paso a rcx la direc de cada ele al iterar en la tabla (siempre en la fila que me dio el usuario)
+            sub		rsp,32
+            call	printf
+            add		rsp,32
 
-        mov		bx,word[matriz + rdi]		; recupero la cantidad total de actividades en el dia de la matriz
+            ;___Obtengo dato a a imprimir de la matrizDada___
+            ;RDI = FilasDesplaz 
+            mov		bx,word[#matrizDada + rdi]	;recupero el valor de la matrizDada
+            ;(R)BX = valor en la matrizDada que quiero recuperar
 
-        mov		rcx,msgCant		;Parametro 1: direccion de memoria de la cadena texto a imprimir
-        mov		rdx,rbx			;Parametro 2: campo que se encuentra en el formato indicado q se imprime por pantalla
-        sub		rsp,32
-        call	printf
-        add		rsp,32
+            ;___Imprimo el dato obtenido___
+            mov		rcx,#FormatoXaTabla		;Parametro 1: direccion de memoria de la cadena texto a imprimir
+            mov		rdx,rbx			         ;Parametro 2: dato recuperado de tabla. imprimo en #FormatoXaTabla
+            sub		rsp,32
+            call	printf
+            add		rsp,32
 
-        add		rdi,2			;Avanzo al próximo elemento de la fila (cada elem. es una WORD de 2 bytes)
-        add		rsi,15			;Avanzo 14 + 1 bytes (1 byte de caract. especial 0 al final de cada dia)
+            add		rdi,2   ;Avanzo LongEle de MatrizDada (cada elem. es una WORD de 2 bytes)
+            add		rsi,15	;Avanzo LongEle + 1 bytes. Tam c/ fila de #tablaImp
 
-        mov		rcx,qword[contador]
-        loop	mostrar
+            mov		rcx,qword[contadorTransitorioRcx]
 
-        ret
+        loop	imprimir
+
+    ret 
 
 
 
@@ -394,7 +403,7 @@ calcDesplaz:
     ret
 
 
-;_____________Rutina para caclular una sumatoria con loop de numeros de una matriz_________________
+;_____________Rutina para caclular una sumatoria con loop de numeros de una matrizDada_________________
 
 section .data
 

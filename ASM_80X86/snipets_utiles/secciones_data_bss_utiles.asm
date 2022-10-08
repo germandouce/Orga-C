@@ -10,8 +10,21 @@ section .data
     #msjOperacionPedidoAlUsuario	     db    "Ingrese la semana [1..6]: ",10,13,0 ;10: \n 13: \r (retorno de carro)
     #formatoDatoInputUsuario             db     "%i",0 ;#FALTA %hi 16 bits / %i 32 bits / %lli 64 bits
 
-    #msjRtaOperacionPedidoUsuario        db     "La sumatoria es : %i",10,0 ; %i 32 bits (doble plbra dword).
-    
+    #msgDescriptivoOperUser	             db	    "Dia      - Cant.Act",10,13,0
+    ;#msjRtaOperacionPedidoUsuario        db     "La sumatoria es : %i",10,0 ; %i 32 bits (doble plbra dword).
+
+    ;cada elemento tiene 14 bytes + el 0 = 15 bytes que le mando al printf
+    #tablaImp   db	"Domingo       ",0
+				db	"Lunes         ",0
+				db  "Martes        ",0
+				db  "Miercoles     ",0
+				db  "Jueves        ",0
+				db  "Viernes       ",0
+				db  "Sabado        ",0
+
+   	
+    #FormatoXaTabla	db	"%lli",10,13,0   ;para "pisar el 0"
+
 
     ;___REGISTROS NombreArchivo Lectura___
 	registro                    times 0 	db ""
@@ -23,16 +36,18 @@ section .data
     ;REGISTROS ARCHIVO ESCRITURA (EN CASO DE SER NECESARIO)
 
     ;___MATRICES___
-    ;Matriz con datos
-    ;observar que son words (2 bytes)
-    matriz	dw	1,1,1,1,1
-			dw  2,2,2,2,2
-			dw	3,3,3,3,3
-			dw	4,4,4,4,4
-			dw	5,5,5,5,5
+    ;Matriz "que se tiene" sin datos
 
     ;matriz llena de 0's
-    matriz		        times 42	dw  0
+    #matrizDada      times 42	dw  0
+
+    ;observar que son words (2 bytes)
+    #matrizDada	dw	1,1,1,1,1
+                dw  2,2,2,2,2
+                dw	3,3,3,3,3
+                dw	4,4,4,4,4
+                dw	5,5,5,5,5
+
 
     ;___VALIDACIONES___
     ;VALIDACION POR TABLA
@@ -43,7 +58,7 @@ section .bss
 
 
     RegEsValido		        resb	1	;'S' - Si 'N'- No
-    contadorLoopValidacion  resq    1   ;para almacenar transitoriamente el rcx
+    contadorTransitorioRcx  resq    1   ;para almacenar transitoriamente
 
     #datoBin	            resb	1   
     ;#dato binario para convertir el dato que leo del archivo

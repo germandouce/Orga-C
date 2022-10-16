@@ -21,15 +21,13 @@ main:
 
     call	abrirArhivo
 
-	cmp		qword[fileHandle],0				;Error en apertura?
+	cmp		qword[handle],0				;Error en apertura?
 	jle		errorOpen
 
 	call	leerArchivo
 	call	#operacionConPedidoAlUsuario
-
-endProg:
-
-	ret
+    
+    ;jmp     endProg
 
 errorOpen:
     mov		rcx, msgErrOpen
@@ -37,7 +35,9 @@ errorOpen:
 	call	printf
 	add		rsp,32
 
-    jmp		endProg
+endProg:
+
+	ret ;esat ret finaliza el programa
 
 
 ;Abro archivo para lectura
@@ -76,7 +76,7 @@ leerArchivo:
             jne		leerReg ;para que no llegue al eof. Iteri hasta el ult rotulo
             
             ;el regsitro es valido...
-            ;EN ESTE ESPACIO VA LA LLAMADA A LA RUTINA QUE AGARRA EL REGISTRO Y LO PROCESA 
+            ;#OJO EN ESTE ESPACIO VA LA LLAMADA A LA RUTINA QUE AGARRA EL REGISTRO Y LO PROCESA 
             ;Luego se salta al siguiente registro
 
             ; Actualizar la actividad leida del archivo en la matriz
@@ -88,7 +88,7 @@ leerArchivo:
     ;________________CloseFiles___________________________
     eof:
         ;cierro archivos    
-        mov     rcx,qword[handleSeleccion]
+        mov     rcx,qword[#nombreArchivoHandle] ;# OJO dejar solo handle..?
         sub     rsp,32
         call    fclose
         add     rsp,32
@@ -102,10 +102,15 @@ VAL_CONSIGNA:
     ;_______Validacion por TABLA de #dato_1_AValidar_______
     mov     rbx,0   ;Utilizo rbx como puntero al vector #tablaDeValidacion
     mov     rcx,7   ;Longitud de vector #tablaDeValidacion. Para la loop
+    
+    ;vale usar una variable x, ej columna
+    ;mov     [diaReal],1
+    
     mov     rax,0   ;#ConteoDias dato convertido en num bin. Arranca en 0 
 
     compDatoAValidar:
-        
+
+            ;inc     byte[diaReal] ;sumo 1 a la columna xa moverme a la sig en la matriz
             ;#ConteoDias
             inc     rax ; sumo 1 al dato convertido en binario (ver datoAValidarPorTablaEsValido)
             ;para moverme de columna en el vector q venia en chars. Sig dia
@@ -124,7 +129,7 @@ VAL_CONSIGNA:
 
             je      #datoAValidarPorTablaEsValido
             add		rbx,2	    ;Avanzo en el vector #tablaDeValidacion el tam de datoAValidarPorTabla
-
+        
         loop    #compDatoAValidar
 
         ;fin ciclo iteraciones de valores del vector #tablaDeValidacion
@@ -134,6 +139,10 @@ VAL_CONSIGNA:
     datoAValidarPorTablaEsValido
         
         ;solo el dia era valido,
+        
+        ;#
+        ;si use una variable antes... #diaReal
+        ;No necesito la prox instr
         ;#conteoDias
         mov		byte[datoBin],al	;Paso el dia en binario a una variable [datoBin]
         ;uso el al porque es solo 1 byte el dia e bpf. El conteo lo hago yo a mano!
@@ -144,7 +153,10 @@ VAL_CONSIGNA:
         jg		invalido
 
     valido:
-	    mov		byte[RegEsValido],'S'			;Devuelve S en la variable esValid si es un reg válido
+        
+        ;#OJO EN MINUSCULAAA
+	    
+        mov		byte[RegEsValido],'S'			;Devuelve S en la variable esValid si es un reg válido
         jmp		finValidar
 
     invalido:
@@ -165,15 +177,18 @@ operacionConMatrizDada:
     mov		rax,0
 	mov		rbx,0   ; x las dudas de q el rbx tenga basura
 
-    
+    ;__Desplazamiento en columna__
+    ;sub     byte[diaReal],1
+
 	sub		byte[#datoBin],1				;(col - 1)
     mov		al,byte[#datoBin]				;al = (col - 1)
 	
-	mov		bl,2			            ;bl = L
-    mul		bl				            ;ax = ax * bl = (col - 1) * L
+	mov		bl,2			            ;bl = LongEle
+    mul		bl				            ;ax = ax * bl = (col - 1) * LongEle
     
 	mov		rdx,rax			            ;rdx = ColsDesplaz 
 
+    ;__Desplazamiento en Filas__
 	sub		byte[#datoAValidarPorRango],1	            ;(fila -1)
 	mov		al,byte[#datoAValidarPorRango]             ;al = (fila -1)
     mov		bl,14			            ;bl = (L * cant.cols)
@@ -379,9 +394,10 @@ calcDesplaz:
 ;Ver si conviene esta o la del pptx!!!!
 
     ;Suponiendo que el indice arranca en 1
-    ;calculo de desplaza hasta llegar (fila, col) de la matriz
-    ;[(fila - 1) * LongFila] = [ (columna -1) * LongElemento]    con longFila = longElemento * CantDeColumnas
-    ;[(fila - 1) * (longElemento * CantDeColumnas)] = [ (columna -1) * LongElemento]       
+    ;calculo de desplaza hasta llegar (fila, col) de la matriz 
+    ;[(fila-1)*longFila]  + [(columna-1)*longElemento]
+    ; [(fila -1) *(longElemento*CantCol)] + [(columna -1) *(longElemento)]
+    ; longFila = longElemento * cantidad columnas     
 
     ;desplazamiento fila
     mov             bx,word[fila] ;

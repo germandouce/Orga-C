@@ -143,9 +143,15 @@ eof:
 VALCAL:
 	mov     rbx,0                       ;Utilizo rbx como puntero al vector dias
 	mov		rcx,7						;7 días por semana
+
+	;xa contra a mano los dias,
 	mov     rax,0                       ;dia convertido en número
+
 compDia:
+
+	;sumo 1 al dia
 	inc     rax
+
 	mov		qword[contador],rcx			;Resguardo el rcx en [contador] porque se va usar para cmpsb
 	mov		rcx,2
 	lea		rsi,[dia]
@@ -161,7 +167,10 @@ compDia:
 	jmp     invalido
 
 diaValido:
+
+	;estoy sumando a mano los dias
 	mov		byte[diabin],al				;Paso el dia en binario a una variable [diabin]
+	
 	cmp		byte[semana],1
 	jl		invalido
 	cmp		byte[semana],6

@@ -113,6 +113,8 @@ section     .bss
 
     desplaz                 resw    1  ;2 bytes como bx
 
+    sumaBeneficios          resw    1; 2 bytes como bx Para hacer la suma de 1's en la fila del usuaior
+
     CodEmpStr               resb    100 ; siempre al FINAL DE LA SECCION xq reserve espacio de sobra
 
 section     .text 
@@ -341,49 +343,70 @@ informe:
         mov		rax,0
         mov     eax,dword[CodigoEmpNum] ;eax = (fila - 1)
 
-        mov		bl,14			; bl = (L * Cant.Cols)
+        mov		bl,10			; bl = (L * Cant.Cols)
         mul		bl				;ax = FilasDeplaz = eax * bl = (fila - 1) * (L * Cant.Cols)
 
         mov		rdi,rax			;RDI = FilasDesplaz 
         ;xq  el retorno de printf puedo llegar a pisar el rax
 
     ;____#msgDescriptivoOperUser_____
-        mov		rcx,msjBeneifios	
-        sub		rsp,32
-        call	printf				;Muestro texto descruptivo al usuario
-        add		rsp,32
+       ; mov		rcx,msjBeneifios	
+       ; sub		rsp,32
+       ; call	printf				;Muestro texto descruptivo al usuario
+        ;add		rsp,32
 
     ;___ impresion de listado indicando tablaImpresion___.
-        mov		rcx,7           ;(long tablaImp) = Cantidad de filas/cols sobre las q voy a iterar
+        mov		rcx,5           ;(long tablaImp) = Cantidad de filas/cols sobre las q voy a iterar
         mov		rsi,0			;Utilizo rsi para moverme en el vector tablaImp
-        mov		rbx,0			;RBX en 0 para no tener basura y levantar valor de cada pos de la tabla. 
+        ;mov		rbx,0			;RBX en 0 para no tener basura y levantar valor de cada pos de la tabla. 
     
-    imprimir:    
-            mov		qword[contadorTransitorioRcx],rcx ;xq con el printf piso el rcx
+    encontrarEmpresa:    
+            ;mov		qword[contadorTransitorioRcx],rcx ;xq con el printf piso el rcx
 
             ;___Imprimo la lyenda de #tablaImp___
-            lea     rcx,[#tablaImp + rsi] ;le paso a rcx la direc de cada ele al iterar en la tabla (siempre en la fila que me dio el usuario)
-            sub		rsp,32
-            call	printf
-            add		rsp,32
+            ;lea     rcx,[#tablaImp + rsi] ;le paso a rcx la direc de cada ele al iterar en la tabla (siempre en la fila que me dio el usuario)
+            ;sub		rsp,32
+            ;call	printf
+            ;add		rsp,32
 
             ;___Obtengo dato a a imprimir de la matrizDada___
             ;RDI = FilasDesplaz 
-            mov		bx,word[#matrizDada + rdi]	;recupero el valor de la matrizDada
+            mov		bx,word[matriz + rdi]	;recupero el valor de la matrizDada
             ;(R)BX = valor en la matrizDada que quiero recuperar
 
             ;___Imprimo el dato obtenido___
-            mov		rcx,#FormatoXaTabla		;Parametro 1: direccion de memoria de la cadena texto a imprimir
-            mov		rdx,rbx			         ;Parametro 2: dato recuperado de tabla. imprimo en #FormatoXaTabla
-            sub		rsp,32
-            call	printf
-            add		rsp,32
+            ;mov		rcx,#FormatoXaTabla		;Parametro 1: direccion de memoria de la cadena texto a imprimir
+            ;mov		rdx,rbx			         ;Parametro 2: dato recuperado de tabla. imprimo en #FormatoXaTabla
+            ;sub		rsp,32
+            ;call	printf
+            ;add		rsp,32
+
+            add     [sumaBeneficios],bx ;voy sumando 1 o 0 segun lo q diga la tabla 
 
             add		rdi,2   ;Avanzo LongEle de MatrizDada (cada elem. es una WORD de 2 bytes)
-            add		rsi,15	;Avanzo LongEle + 1 bytes. Tam c/ fila de #tablaImp
+            
+            ;add		rsi,15	;Avanzo LongEle + 1 bytes. Tam c/ fila de #tablaImp
 
-            mov		rcx,qword[contadorTransitorioRcx]
+            ;mov		rcx,qword[contadorTransitorioRcx]
 
-        loop	imprimir
+        loop	encontrarEmpresa
+        
+        cmp     [sumaBeneficios],5
+        je      OfreceTodos ;si es 5 ofrece todos sino...
 
-    ret 
+        mov		rcx,msjNoOfreceTodos	
+        sub		rsp,32
+        call	printf				;Muestro texto descruptivo al usuario
+        add		rsp,32 
+        
+        jmp     finInforme
+
+        OfreceTodos:
+            mov		rcx,msjOfreceTodos	
+            sub		rsp,32
+            call	printf				;Muestro texto descruptivo al usuario
+            add		rsp,32
+
+    finInforme:
+
+        ret 

@@ -1,0 +1,267 @@
+106001 DOUCE GERMAN A.
+EJERCICIO NUMERACION:
+
+Se tiene la siguiente secuencia de caracteres EBCDIC que representa una 
+cadena de 4 empaquetados de 2 bytes de longitud 
+(sin superposiciones)
+
+j % a # p ? d )
+
+a) Indicar cuáles son los números almacenados en base 10 en cada empaquetado.
+
+b) Tomar el valor A como los últimos tres dígitos del número de padrón 
+(ej.: Padrón 9876510 => A = 510) y 
+restarle el valor del primer empaquetado en formato BPF 
+c/signo de 16 bits indicando la validez del resultado.  
+Nota: Escriba CLARAMENTE su número de Padrón.
+
+c) Tomar el valor resultado del punto anterior y almacenarlo en 
+formato BPFlotante IEEE 754 de precisión simple expresando 
+su configuración octal.
+____________________________________________________________________________________________________________________________
+20:18
+
+a) Indicar cuáles son los números almacenados en base 10 en cada empaquetado.
+
+Pirmero obtengo la representacion en hexadecimal de la cadena dada
+
+  j   %   a  #   p   ?  d   )
+ 91  6C  81 7B  97  6F  84 5D
+
+Me dicen q rerpresnta una cadena de 4 empaquetados de 2 bytes de longitud cada uno.
+Como el formato empaquetado "esta" en bade 16, solo resta obtener los numeros
+en base 10 almacenados sabiendo que estan separados por letra y que 
+CAFE indican que  son positivos mientras que B y D indica q son negativos
+
+916 C -> 1er eapaquetado:-> nro almacenado: 916 [10]
+817 B -> 1er eapaquetado: nro almacenado: -817 [10]
+976 F -> 1er eapaquetado: nro almacenado: 976 [10]  
+845 D -> -> 1er eapaquetado:nro almacenado: -845[10]
+____________________________________________________________________________________________________
+b) Tomar el valor A como los últimos tres dígitos del número de padrón 
+(ej.: Padrón 9876510 => A = 510) y 
+restarle el valor del primer empaquetado en formato BPF 
+c/signo de 16 bits indicando la validez del resultado.  
+Nota: Escriba CLARAMENTE su número de Padrón.
+
+MI PADRON : 106001
+A = 001 [10]
+
+Almaceno A en BPF con signo
+
+1) Paso el numero de base 10 a base 2.
+
+A = 1 [10] = 1 [2]
+
+2) Completos con 0's a izquierda:
+Me piden que haga la resta en BPF de 16 bits asiq  completo con 15 bits
+
+A en BPF C/ signo : 0000 0000 0000 0001.
+
+Ahora, llamo al valor del primer empaquteado
+B = 916[10]
+Lo almaceno en BPF c/ signo. 
+Lo paso de base 10 a base 2. Para ello primero lo paso de base 10 a base 16 
+con el metodo de diviones sucesivas para hacer menos cuentas y dsps de 
+base 16 a base con el  mecanismo de base potencia.
+
+
+916/16 (resto 4)
+57/16 (resto 9)
+3/16 (resto 3)
+0
+Entonces, 
+
+916[10]= 394 [16]
+
+Ahora sabiendo que 2^ 4 = 16 ( 4 simbolos en base 2 son 1 en base 16)
+lo paso de base 16 a base 2.
+ 3     9    4	
+0011 1001 0100
+
+B = 0011 1001 0100[2]
+Como debo hacer la resta en BPF C signo, almaceno B en dicho formato
+
+1) Completo con 0's a izq hasta llegar a 16 bits...
+
+B en BPF c/ signo  = 0000 0011 1001 0100[2]
+
+Por simplicidad de notacion, renombro la representacion de 
+A y B en BPF C/ signo  como A y B respectivamente.
+
+A en BPF C/ signo -> A = 0000 0000 0000 0001 [2]
+B en BPF c/ signo -> B 0000 0011 1001 0100[2]
+
+Debo hacer la resta A - B,
+en bpf c/ sugno no se puede "restar"
+A + COMP(B) = A + NOT+1(B)
+
+Hallo el complemento de B.
+
+
+B      = 0000 0011 1001 0100
+                         11 
+not(B) = 1111 1100 0110 1011
+                          +1
+-----------------------------
+comp(B)= 1111 1100 0110 1100 
+
+Listo! ya puedo hacer la cuenta
+
+A + comp(B)
+          00                    
+A =        0000 0000 0000 0001
+                             + 
+Comp(B) =  1111 1100 0110 1100
+------------------------------
+A+Comp(B)= 1111 1100 0110 1101
+
+
+El resultado en BPF c/ signo es: 1111 1100 0110 1101
+Es valido ya que los dos ultimos dos carries ( o y 0) son
+iguales.
+
+
+---xa corroborar--------
+Chequeo:
+
+1 - 916 = -915
+
+1111 1100 0110 1101
+0000 0011 1001 0010
++                 1
+0000 0011 1001 0011[2] = -915 en base 10
+OK!
+--------------------------------
+______________________________________________________________________
+c) Tomar el valor resultado del punto anterior y almacenarlo en 
+formato BPFlotante IEEE 754 de precisión simple expresando 
+su configuración octal.
+LLamo R Al numero del resultado y res a su config en bpf c/ signo.
+
+1) Obtengo el avlor absoluto del numero en base 2. 
+Como el primer bit es 1 y esta en BPF con signo,
+Pirmero hallo su complemenot con not + 1 (res) 
+
+#NEGATIVO (xa no olvidarme dsps busco #, si sigue esto, me olvide)
+
+A+Comp(B)= 1111 1100 0110 1101 = res
+
+res      = 1111 1100 0110 1101
+                               
+not(res) = 0000 0011 1001 0010
+                            +1
+-------------------------------
+comp(res)= 0000 0011 1001 0011 
+
+El valor absoluto en base 2 del resultado es 
+R = 0000 0011 1001 0011.
+
+Aprovecho esto ultimo y almaceno en BP flotante de prs simple
+
+1) Normalizo la mantisa corriendo la coma..
+R = 1,110010011 * 2^9
+
+Corro la coma 9 veces 
+=> exponente = 9[10]
+
+
+2) Exponente en exceso,
+Exp en exc = exp   + exceso(simple)
+Exp en exc = 9[10] + 127[10] = 136 [10]
+Paso exp en exceso a base 2
+
+Exp en exc = 136[10] = 10001000 [2]
+
+3)Almaceno el numero 
+
+Signo = 1 (1 bit)
+Exp en Exc = 1000 1000 * bits)
+Fraccion (con 0's agregados) = 1100 1001 1000 0000 0000 000 (23 bits)
+
+Config en base 2
+
+1       | 10001000   | 1100 1001 1000 0000 0000 000 |  (32 bits! ok)
+1 bit       8 bits	  23 bits
+(signo) (exp en exc)    (fraccion)
+
+Para hallar la config octal paso el numero de base 2 a base 8
+sabiedno que como 2^3 = 8 3 digitos en base 2 son 1 en base 8
+
+ 011 000 100 011 001 001 100 000 000 000 000 [2]
+  3   0   4   3   1   1   4   0   0   0   0  [8] 
+
+RTA:
+CONFIG OCTAL DEL NUMERO ALMACEADO EN BPF IEEE 754 DE PREC simple:
+
+  3   0   4   3   1   1   4   0   0   0   0  [8]
+
+21:07--
+T total:  20:18 a 21:07 = 49 min.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+

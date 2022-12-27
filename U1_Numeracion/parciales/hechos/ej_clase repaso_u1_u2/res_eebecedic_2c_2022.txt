@@ -1,0 +1,192 @@
+1,25 ptos.]Se tiene la siguiente secuencia de caracteres EBCDIC. 
+Su codificación hexadecimal representa una cadena de 2 BPF c/signo de 16 bits. (sin superposiciones)
+@ C 1 h
+Se pide:
+[0,5 ptos.] Indicar cuáles son los números almacenados en base 10 en cada BPF c/signo.
+[0,75 ptos.] Restar los números obtenidos en a) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+
+2) [0,75 ptos.]Se dispone de un formato de representación de números 
+flotantes basado en IEEE 754 en el cual se utilizan 2 bytes para almacenar: el signo (1 bit), 
+el exponente en exceso como BPF s/signo (6 bits) y los dígitos de la mantisa (9 bits) normalizados en base 2.
+
+Dado A = 9613 que representa la configuración decimal de un número almacenado en formato empaquetado de 2 bytes,
+almacenar dicho número en el formato flotante propuesto indicando su configuración octal.
+_______________________________________________________________________________________________________________________
+[0,5 ptos.] Indicar cuáles son los números almacenados en base 10 en cada BPF c/signo.
+
+Como me dicen que su codificacion hexadecimal represnta una cadena de 2 bpf c/signo,
+1°) Hayo la codif. hexa. con tabla EBECEDIC.
+
+ @ C  1  h
+7C C3 F1 88 [16]
+
+Como representa una cadena de BPFC C/ signo de 16 bits y este ultui formto 
+"esta" en base 2 paso la caena de base 16 a base 2 con el mecanismo de base potencia
+sabiendo 1ue como 2^ 4 = 16, 1 digito en base 16 equivale a 4 en base 16
+
+ 7    C    C     3   F     1    8    8 [16]
+0111 1100 1100 0011 1111 0001 1000 1000[2]
+
+Ahora que tengo la cadena en base 2, puedo ver lo 2 bpf c signo sabiendo que son de 16 bits c/ uno
+
+1er bianrio A = 0111 1100 1100 0011
+2do BPF B =  1111 0001 1000 1000
+
+Ahora envcuentro lo numero almacenados en base 10/
+------------------------------------------------------------------------------------------
+Para A)
+Como el priber bit es 0, se que el nuemro es positivo.
+Ya tengo el valor absoulto del  nuemro almacenado en base 2.
+Solo tengo que pasrlo a base 10. 
+Para ello, primero lo paso a base 16 sabiedo que 2 & 4 = 16 
+y luego de base 16 a base 10 con el teorema de la numeracion.
+
+0111 1100 1100 0011 [2]
+ 7    C     C    3  [16] 
+ahora de base 16 a base 10
+
+3*16^0 + C*16^1 + C*16^2 + 7*16^3 = 31939 [10]
+
+Numero almacenado en A = 31939 [10] 
+--------------------------------------------------------------------------------------------
+Para B)
+2do BPF B =  1111 0001 1000 1000
+Esta vez, el primer bit es 1, xq lo q el nuemero almacenado es negativo
+Busco su complemento con not + 1
+
+B      = 1111 0001 1000 1000
+                        111  
+NOT(B) = 0000 1110 0111 0111
+                         + 1
+-----------------------------
+comp(B) = 0000 1110 0111 1000
+
+
+Ahora ya tengo el valor absoluto del numero almacenado en B pero en base 2.
+Lo paso a base 10 con el mismo metodo que use para A.
+
+0000 1110 0111 1000[2]
+  0    E  7     8 [16]
+
+lo paso a base 10 con tfn (mismo metodo que antes)
+
+El nuemro almacenado en B es - 3704 [10]
+__________________________________________________________________________________________________________
+b) [0,75 ptos.] Restar los números obtenidos en a) en formato BPF c/signo de 16 bits 
+indicando la validez del resultado.
+
+Aprovcho lois numeros que tenia almacenado sen BPF en el item anterior y los resto
+
+1er BBPFA =  0111 1100 1100 0011
+2do BPF B =  1111 0001 1000 1000
+
+Para hacer la resta debo hacer A - B = A + Comp(B)
+
+Aproveccho tambuien, del ej anterior, que ya tuve que hallar el complemento de B
+comp(B) = 0000 1110 0111 1000
+
+Entonces solo rsta hacer la cuenta...
+          01111 1  1 1      
+A       =  0111 1100 1100 0011
+                             + 
+Comp(B) =  0000 1110 0111 1000
+--------------------------------
+A-B     =  1000 1011 0010 1011
+           1000 1011 0011 1011
+Como los ultimos 2 acareoos ( 0 y 1 ) son distintos hay OVERFLOW y el resultado no es valido.
+(Observar que el numero pasado decimal da efectivamente el valor que deberia pero en teoria
+esta almacenado en un BPF c/signo entonces el primer  bit indicaria q es negativo y el numero
+comenzaria a partir del primer 1.
+________________________________________________________________________________________________
+FALTA
+2) [0,75 ptos.]Se dispone de un formato de representación de números 
+flotantes basado en IEEE 754 en el cual se utilizan 2 bytes para almacenar: el signo (1 bit), 
+el exponente en exceso como BPF s/signo (6 bits) y los dígitos de la mantisa (9 bits) 
+normalizados en base 2.
+
+Dado A = 9613 que representa la configuración decimal de un número almacenado en 
+formato empaquetado de 2 bytes,
+almacenar dicho número en el formato flotante propuesto indicando su configuración octal.
+
+Como el formato empaquetado "esta"/"usa" en base 16  paso el numero A de base 10 a base 16.
+Para ello uso el metodo de divisiones sucesivas.
+
+9613/ 16 (resto = 13)
+600/16 (resto = 8)
+37/ 16 (resto = 5)
+2/ 16 (resto = 2)
+0
+
+
+A = 9613 [10] = 258D [16]
+
+Ya lo tengo en abse 16, sabiendo que eta en formato empaquetado, el numero
+almacenado en A es
+ 
+A = -258
+
+El sugno - se debe a q hay una D en el ultimo nibble
+(reuso la letra A, para facilitar lectura. 
+ya se que el nuemro almacenado no es lo mismo que el formato)
+
+Alamceno el numero en formato IEEE 754	flotante
+
+
+1) Paso el valor absoluto del nuemro de base 10 a abse 2. Para ello uso el metodo de diviones 
+sucesivas mostrado arriba
+
+258 [10] = 100000010[2] 
+
+2) Nomrmalizo la mantisa (corro la como)
+
+1,00000010 
+
+Fraccion = 00000010 
+(corro la coma 8 veces)
+esxponente = 8 [10]
+
+3) Exponente en exceso = exponente + exceso
+Ya tengo el exponente. me falta el exceso!
+
+Como la presicion del exponente en exceso es de 6 bits entonces...
+Exceso = 2^n /2 -1 = 2^6 /2 -1 = 31[10]
+
+Exponente en exceso = 8 + 31 [10] = 39 [10]
+
+4) Paso el exponente en exceso a base 2,
+
+exp En exceso = 100111[2]
+
+5)Almaceno el numero 
+
+Signo = 1
+Exp en exceso = 100111
+Mantisa = 00000010|0 (agregue 1 vcero paar llegar a 9 bits)
+
+Numero en IEEE flotante consigna:
+1    |100111|000000100 
+signo ExpEEx  Mantisa norm
+------------------------------------------------------------------------------
+Indico su configuracion octal.
+Paara ello paso el numero de base 8 a base 2 sabiedn que 2^3 = 8
+es decir que 3 digitos en base 2 equivalen a 1 en base 8
+
+001 100 111 000 000 100 [2]
+ 1   4  7    0   0   4 [8]
+
+Config octal del numero almacenado en .flotante
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

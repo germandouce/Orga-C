@@ -1,0 +1,165 @@
+16:38 -
+
+[1,25 ptos.]Se tiene la siguiente secuencia de caracteres EBCDIC. Su codificación hexadecimal representa una 
+cadena de 2 BPF c/signo de 16 bits. (sin superposiciones)
+	d H ? 8
+Se pide:
+a) [0,5 ptos.] Indicar cuáles son los números almacenados en base 10 en cada BPF c/signo.
+b) [0,75 ptos.] Restar los números obtenidos en a) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+(primero menos el segundo)
+c) Ddo A = 
+
+	a) [0,5 ptos.] Indicar cuáles son los números almacenados en base 10 en cada BPF c/signo.
+
+Primero obtengo la codificacion hexadecimal de cada carcter para obtener una cadena en hexadecimal.
+
+      d   H    ?    8
+     84   C8   6F   F8 [16]
+
+Como el formato BPF se escribe en base 2, paso el numero anterior de base 16 a base 2 tal cual esta sabiendo que
+como 2 ^4 = 16 entonces 4 digitos en base 2 equivalen a 1 en base 16.
+
+  8    4   C     8   6    F    F    8    [16]
+1000 0100 1100 1000 0110 1111 1111 1000 [2]
+
+Ahora que esta en base 2, como me dicen que representa una cadena de 2 BPF C/ signo de 16 bits, obtengo los 2 numeros
+sabiendo que ocupan 16  digitos cada uno. Los llamo A y B.
+
+
+A = 1000 0100 1100 1000
+B = 0110 1111 1111 1000 
+
+Obtengo los numeros almacenados en A y B. y los llamo A_1 Y B_1.
+
+Para el numero en A, como el formato es BPF C/signo  y el primer bit es 1, se que 
+ES NEGATIVO!!!!!!!!!!!!!!!!!!!!!! (xa no olvidarme pongo muchos signitos)
+
+Entonces, primero complemento con NOT + 1.
+
+A    =   1000 0100 1100 1000
+
+CARRIES:                111 
+NOT(A) = 0111 1011 0011 0111
+         +                 1
+        ---------------------
+A_1 =    0111 1011 0011 1000 [2]
+
+Ahora que tengo el numero en base 2, para obetner el almacenado en base 10 paso el numero
+primero a base 16 usando el metodo inverso del ejercicio anterior y luego de base 16 a base
+10 a traves del TFN. De esta forma reduzo el numero de cuentas.
+
+A_1 =    0111 1011 0011 1000 [2]
+A_2 =     7    B    3    8  [10]
+
+
+Ahora uso el TFN para pasar de base 16 a base 10.
+
+A_2 =     7    B    3    8  [10]
+
+A_2 =  8*16^0 + 3*16^1 + B*16^2 + 7*16^3 = -31544 [10]
+
+Numero almacenado en A---> A_1 = -31544 [10]
+
+Para el numero alacenado en B, como el primer bit es 0, se que espositivo por lo cual 
+para obtener el numero almacenado en base 10 solo debo pasar de base 10 a base 2 con el
+mismo metodo del ejercicio anterior. Lo llamo B_2
+
+
+B = 0110 1111 1111 1000 [2]
+
+B = 28664 [10]
+
+Numero almacenado en B ------> B_2 =  28664 [10].
+
+
+	b) [0,75 ptos.] Restar los números obtenidos en a) en formato BPF c/signo de 16 bits indicando la validez del 
+resultado. (primero menos el segundo)
+Debo hacer A - B. Pero los numeros ya venian en BPF C/ signo asi q solo debo hacer la cuenta.
+
+A -  B = A + Comp(B)
+
+
+Primero obtengo el complemento (not +1) de B recordando que B era
+
+B =      0110 1111 1111 1000 
+
+Carries:                111  
+NOT(B) = 1001 0000 0000 0111
+         +                 1
+         ---------------------
+Comp(B)= 1001 0000 0000 1000
+
+
+Ahora solo resta hacer a cuenta:
+
+        10            1      
+A =      1000 0100 1100 1000
+         +                     
+Comp(B)= 1001 0000 0000 1000
+         --------------------
+A - B =  0001 0100 1101 0000
+
+El resultado es INVALIDO!! Pues hay overflow!! (los dos ultimos carries son distintos 1 y 0)
+
+
+3)Dado A que representa config octal de un numero en formato zoneado de 2 bytes, almacarlo en itriple e de precision
+simple y dar config heaxadecimal.
+A = 170663 [8]
+
+
+Puesto que el formato zoneado utiliza la base 16 y yo tengo la config octal, primero paso el numero
+tal cual está de base 8 a base 16. Para ello hago pivot en la base 2 sabiendo que 3 caracteres en base 2 equivalen
+a 1 en base 8 (2^3 = 8) y 4 caracteres en base 2 equivalen a 1en base 16.
+
+      1   7   0   6   6   3 [8]
+     001 111 000 110 110 011 [2]
+                     
+     0000 1111 0001 1011 0011
+      0     F    1    B    3  [16]
+
+Ahora que esta en base 16, como se que es formato znoeado de 3 bytes y que el ultimo nibble contiene una B
+(y por lo tanto es negativo) recupero el numero en almacenado en base 10 siendo este:
+
+-13 [10]. Ahora que tengo el numero e base 10, lo almaceno en config IEEE 754.
+Para ello primero paso el valro absoluto del numero a bianrio:
+
+1101 [2]
+
+2°) Normalizo la mantisa corriendo la coma 3 veces.
+   
+    1,101
+
+Exponente = 13[10]
+3°)
+Como la presicion del exponente en exceso es de 8 bits entonces el exceso es de 127.
+Exponente en exceso = exponente + exceso
+Exponente en exceso = 13[10] + 127[10] = 140[10]  
+Paso el exponente en exceso a base 2,
+
+140[10] = 10001100 ( 8 bits ok! )
+
+4°)  Fraccion = 10100000000000000000000 (23 bits)
+
+5°) Signo --> NEGATIVO ! --> primer bit es 1.
+
+6°)Nro final:
+
+
+1     | 10001100 | 10100000000000000000000 |
+1 bit     8 bits            23 bits
+
+RTA:
+Nro almacenado en IEEE754:
+11000110010100000000000000000000
+
+Config hexadecimal del numero almacenado en:
+(paso el numero anterior de base 2 a base 16 tal cual esta) sabiendo que  4 digitos en base 2 equivalen a 1 en base 16.
+
+  1100 0110 0101 0000 0000 0000 0000 0000
+   C    6    5    0    0    0    0    0
+
+16:38 ---> 17:48 1hr 10 min.
+
+
+
+

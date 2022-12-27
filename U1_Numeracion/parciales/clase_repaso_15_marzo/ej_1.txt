@@ -1,0 +1,104 @@
+Dado A que representa la configuración en base 10 de un número almacenado en formato empaquetado de 3 bytes, se pide:
+a) Indicar cuál es el número almacenado.
+b) Almacenar el el número en formato BPFlotante IEEE 754 de precisión simple, dando su configuración hexadecimal.
+A = (69659)10
+
+19:05 -
+
+	a)
+
+Dado que el formato empaquetado utiliza la base 16 y me dan la configuracion en base 10, primero paso el 
+numero tal cual está de ase 10 a base 16 utilizando el metodo de divisiones sucesivas.
+
+A = (69659)10
+
+
+69659 / 16 (resto 11)
+4353/ 16 (resto 1)
+272/ 16 (resto 0)
+17/ 16 (resto 1)
+1
+
+
+A[16] = 1101B
+
+Ahora que tengo la config en base 16 de un empaquetado de 3 bytes, recupero el numero almacenado sabiendo que es
+negtivo porque el ultimo nibble tiene una B.
+
+
+------------ numero almacenado representado en base 10 : -1101 -----------
+
+
+	b)Almacenar el el número en formato BPFlotante IEEE 754 de precisión simple, dando su configuración 
+hexadecimal.
+
+Como el formato BPF/ IEEE 754 utiliza la base 2, primero obtengo el valor del numero obtenido en el iitem a)
+expresado en base 2. Para ello primero paso el numero a base 2 
+¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡RECORDANDO QUE ES NEGATIVO!!!!!!!!!!!! (XA NO OLVIDARME)
+utilizando el metodo de divisiones sucesivas mostrado en el item anterior solo que en vez de dividir por 16 se dividira 
+por 2.
+
+
+A[2] = -10001001101
+
+Como el numero es negativo el primer bit sera 1.
+Teniendo el numero en base 2....
+
+2°) Normalizo la mantisa corriendo la coma 10 veces.
+
+	1,0001001101
+
+1,0001001101 * 10^10
+
+3°)
+Exponente en exceso = Exponente + Exceso
+Exponente en exceso[10] = 10[10] + 127[10] = 137[10] ( el 127 es por ser de precision simple)
+Paso el exponente en exceso a base 2
+
+137[10] = 10001001[2] (8 bits ok!)
+
+4) SIGNO NEGATIVO!!! -> EL PRIMER BIT ES 1
+
+5) Fraccion = 00010011010000000000000 (23 bits)
+
+5°)nro final:
+
+RTA:
+Nro almacenado en BPF IEEE 754 PRECISION SIMPLE:
+
+   1	|10001001|00010011010000000000000| (32 bits pues es precision simple)
+1 bit     8 bits    23 bits
+
+Configuracion en base 16:
+(la obtengo sabiendo que como 2^4 = 16, 4 digitos en base 2 se representan con 1 en base 16.
+
+   1100 0100 1000 1001 1010 0000 0000 0000|  [2]
+    C    4    8     9   A    0     0   0  [16]
+
+RTA: Config en base 16:
+	C489A000 
+
+
+19:05 ---> 19:28: 23 minutos.
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+

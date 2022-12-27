@@ -1,0 +1,7 @@
+EJEMPLO1.ABA  Algoritmo de multiplicacion, multiplica las celdas
+              014 y 015 y deja el resultado en la 016.
+
+PONECERO.ABA  Ejemplo de programa que se re-escribe, pone en cero
+              n celdas a partir de la 015, el numero n debe estar
+              almacenado en la celda 014.
+

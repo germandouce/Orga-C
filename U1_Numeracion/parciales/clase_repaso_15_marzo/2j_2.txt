@@ -1,0 +1,201 @@
+19:50 -
+2)
+
+Dado B que representa la configuración hexadecimal de un número almacenado en formato BPFlotante IEEE 754 de precisión 
+simple, se pide:
+a) Indicar cuál es el número almacenado.
+b) Restar ambos números (el almacenado en A menos el almacenado en B) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+
+3)
+Almacenar el resultado de 2b) en BPFlotante IEEE 754 de precisión simple, dando su configuración octal.
+
+B = (C5002000)16
+
+	a) Indicar cuál es el número almacenado.
+
+Como el formato BPF Itriple e utiliza para su almacenamiento la base 2 y me dan la config en base 16 del mismo, primero 
+paso el numero tal cual está de base 16 a base 2 sabiendo que como 2^4 = 16 entonces 4 digitos en base 2 representan 
+1 en base 16.
+
+B = C5002000 [16]
+B = 11000101000000000010000000000000 [2] (32 digitos ok!)
+
+Ahora que tengo la config e base 2 del numero en BPF ITRIPLE E, recupero el numero viendo las partes.
+
+1°) Como el primer bit es 1 enotnces el numero es NEGATIVO!!!!!!!! (XA no olvidarme)
+
+2°)Los siguientes 8 bits representan el exponenete en exceso:
+Exponente en exceso [2] = 10001010
+Pasado a base 10...
+
+Exponente en exceso = 138 [10]
+como exp en exceso = exponente + exceso y se que esta en precision simple...
+	138 = exponente + 127
+	Exponente = 11[10]
+
+3°)Los ultimos 23 bits representan la fraccion.
+Agregando un 1 adelante, escribo la matisa y luego corro la coma tantas veces como diga el exponente (11 en este caso)
+
+1,00000000010000000000000
+
+corriendo la coma 11 veces...
+
+100000000010[2]
+Paso el numero de base 2 a base 10 para obetener el numero almacenado. Para ello priomerp paso de base 2 a base 16 
+sabiendo que como 2^4 = 16 entonces 1 digito en base 16 representa 4 en base 2.
+Luego paso de base 16 a base 10 usando el TFN. De esta forma reduzoc el nuemro de cuentas.
+
+ 1000 0000 0010 [2]
+  8     0    2 [16]
+
+Y ahora paso de base 16 a base 10 a traves del TFN.
+
+= 2 x 16^0 + 0 x 16^1  + 8 x 16^2 = 2050[10]
+
+El numero almacenado expresado en base 10 es -2050. ERA NEGATVO!!!!!!!! (PRIMER BIT ERA 1)
+
+
+
+	b) Restar ambos números (el almacenado en A menos el almacenado en B) en formato BPF c/signo de 16 bits indicando 
+	la validez del resultado.
+
+Para mayor facilidad en la lectura, llamo A al numero almacenado en A y B al numero almacenado en B.
+
+A = -1101 [10]
+
+Lo almaceno en BPF c/signo.
+Primero lo paso a base 2 para hallar su valor absoluto en base 2. 
+
+A = 10001001101[2]
+Luego completo con 0´s a izquierda hasta alcanzar 16 digitios
+Como es negativo, debo complementarlo para almacenarlo haciendo hacer NOT + 1.
+
+A =       0000010001001101
+
+Carries:
+NOT(A) =  1111101110110010
+	  +              1
+	  -------------------
+
+Comp(A)= 1111101110110011 
+
+
+A almacenado en BPF C/siggno: (lo llamo A_1 para mas facilidad)
+A_1 =	1111101110110011 
+
+
+El numero almacenado en B (lo llamo B) era 2050[10]
+Para almacenaro en bpf c/signo lo paso primero a base 2
+haciendo pivot en la base 16 y luego usando el TFN para pasar de base 16 a base 10.
+Como es el mimso metodo que el ej anterior no lo repito.
+
+-2050[10] = -100000000010 [2]
+
+Completo con 0´s a izquierda, y 
+
+B = 	0000100000000010
+
+Como es negativo, complemento con not +1 
+
+          0000100000000010
+
+Carries:                1
+NOT(B) =  1111011111111101
+         +               1
+          ---------------------
+not + 1 = 1111011111111110
+
+
+B_2 =  1111011111111110 (numero almacenado en B expresado en bpf c/signo)
+
+
+
+Como es negativo hago not + 1 para almacenarlo
+
+Como necesito hacer A_1 - B = A - Comp(B)
+
+Pero B es negativo, entonces para almacenarlo hare comp(comp(B))
+que es igual a B.
+Entonces simplemente hago la suma de A_1 + B
+
+
+
+Para hacer la resta necesito hacer A_1 + comp (B_2)
+Calculo comp(B_2)
+      
+B_2 =    1111011111111110 
+                       1
+not       0000100000000001
+          +              1
+         -----------------
+not + 1=  0000100000000010
+comp(B_2)=0000100000000010
+
+
+Ahora hago la suma de A_1 + comp(B_2)
+
+
+Carries:  11111         1 
+A_1 =	   1111101110110011 
+	   +               
+comp(B_2)= 0000100000000010
+           -----------------
+A - B =    0000001110110101
+
+Como los 2 ultimos carries son iguales el resultdo es valido (No hay OVERFLOW!)
+
+RTA:
+A - B =    0000001110110101 (RESULTADO VALIDO!) 
+
+
+Para almacenar en bpf itriple e simple,
+como el numro de 2b) ya esta en binario y sabemos que es positivo pues el primer bit es 0,
+podemos empezar a normalizar el numero.
+
+2°)Normalizo la mantisa, corriendo 9 veces la coma hacia la izq.
+
+1,110110101 
+
+3°) Exoponente en exceso = Exponente + Exceso
+    exponente en exceso = 9[10] + 127[10] = 136[10]
+Paso el exponenete en exceso a base 2
+
+136[10] = 10001000[2] (8 bits ok)
+
+
+4°)Fraccion = 11011010100000000000000 (23 bits ok) 
+
+5°) Signo---> 0 pues es positivo
+
+6°) Nro final:
+
+Almacenamiento en IEEE754 del resultado de 2b):
+0 10001000 11011010100000000000000 (32 bits)
+
+Su config octal se obtiene pasando el numero tal cual esta de base 2 a base 8 sabiendo que como 2^3 = 8
+enotnces 3 digitos e base 2 son 1 en base 8.
+
+001 000 100 011 011 010 100 000 000 000 000 
+ 1   0    4  3   3   2   4   0   0    0  0 [8]
+
+RTA:
+Config en base 8 del numero almaceado en Ieee754.
+
+10433240000.
+
+19:50 --- 20:58
+
+1 HORA 8 MIN. + 23 min ej1 ---> 1 hora 33min.
+
+
+
+
+
+
+
+
+
+   
+
+
+

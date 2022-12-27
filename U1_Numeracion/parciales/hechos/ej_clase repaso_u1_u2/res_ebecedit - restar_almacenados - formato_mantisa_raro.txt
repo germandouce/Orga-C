@@ -1,0 +1,188 @@
+﻿20:22 -
+
+[1,25 ptos.]Se tiene la siguiente secuencia de caracteres EBCDIC. Su codificación hexadecimal representa una 
+cadena de 2 BPF c/signo de 16 bits. (sin superposiciones)
+	@ C 1 h
+Se pide:
+) [0,5 ptos.] Indicar cuáles son los números almacenados en base 10 en cada BPF c/signo.
+[0,75 ptos.] Restar los números obtenidos en a) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+
+
+ej 1)
+
+a)
+Como me dicen que su codificacion hexadecimal represnta una cadena de 2 bpf c/signo,
+1°) Hayo la codif. hexa. con tabla EBECEDIC.
+
+   @   C   1   h
+  7C  C3  F1  88
+
+2°) pao a base 2 la cadena a través del metodo de base potenciia sabiendo que
+como 2^4 = 16, 1 digito en base 16 equivale a 4 digitos en base 2. 
+
+  7    C    C   3     F     1     8   8
+ 0111 1100 1100 0011 1111 0001 1000 1000
+
+
+1er BPF C/signo lo llamo A = 0111 1100 1100 0011
+2do BPF C/signo lo llamo B = 1111 0001 1000 1000
+
+Para el numero A)
+1°)Como el primer bit es 0, se que el numero almacenado es positivo y por tanto ya tengo el numero
+en valor absoluto en base 2.
+
+2°)Paso el numero a base 10 pivotendo en base 16 para disminuir los caluclos y escritura.
+
+-Paso a base 16 con base potencia sabiendo que 4 digitos en base 2 son 1 en base 16.
+0111 1100 1100 0011 [2]
+ 7     C    C   3   [16]
+
+Ahora a traves del TFN, paso de base 16 a base 2.
+
+
+3*16^0 + C*16^1 + C*16^2 + 7*16^3 = 31939 [10]
+
+----------- Primer BPF A = 31939 [10] --------------
+
+Para el numero B = 1111 0001 1000 1000
+
+Como el primer bit es 1, se que el numero almacenado es negativo. Para hallar su valor absoluto
+en base 2 hago NOT + 1
+
+B =      1111 0001 1000 1000
+
+Carry:                  111
+NOT(B) = 0000 1110 0111 0111
+	 +                 1
+        ----------------------
+COMP(B)= 0000 1110 0111 1000
+
+RECORDAR ES NEGATIVO!!!!!!!!
+
+Paso a base 10 igua que en el ejercicio anterior, pivoteando en base 16 y luego usando el TFN.
+
+   0000 1110 0111 1000 [2]
+     0    E    7    8  [16]
+
+Uso TFN
+
+8*16^0 + 7*16^1 + E*16^2 + 0*16^3 = -3704[10]
+
+----------- SEGUNDO BPF B  = - 3704[10] --------------
+
+
+b)
+Restar los números obtenidos en a) en formato BPF c/signo de 16 bits indicando la validez del 
+resultado.
+
+Tomo los numeros que ya venian en la cadena de chars EBECEDIC, A y B.
+
+A = 0111 1100 1100 0011
+
+B = 1111 0001 1000 1000
+
+Como A almacena un positivo (1er bit 0) no hago nada. Como B almacena un negativo hago
+A + Comp(B) y aprovecho el Comp(B) calculado en el item anterior.
+Entonces...
+
+Carry:   01111 1  1 1          
+A =       0111 1100 1100 0011
+          +                     
+COMP(B)=  0000 1110 0111 1000
+         ----------------------
+          1000 1011 0011 1011 
+
+31939 - (-3704) = = 35643 
+
+Como los ultimos 2 acareoos ( 0 y 1 ) son distintos hay OVERFLOW y el resultado no es valido.
+(Observar que el numero pasado decimal da efectivamente el valor que deberia pero en teoria
+esta almacenado en un BPF c/signo entonces el primer  bit indicaria q es negativo y el numero
+comenzaria a partir del primer 1.
+
+21:30 con anotaciones extras 
+1 hora 8 min
+
+
+
+ej 2)
+
+
+
+Se dispone de un formato de representación de números flotantes basado en IEEE 754 en el cual 
+se utilizan 2 bytes para almacenar: el signo (1 bit), el exponente en exceso 
+como BPF s/signo (6 bits) y los dígitos de la mantisa (9 bits) normalizados en base 2.
+
+Dado A = 9613 que representa la configuración decimal de un número almacenado en formato 
+empaquetado de 2 bytes, almacenar dicho número en el formato flotante propuesto indicando 
+su configuración octal.
+
+Exceso para n = n bits (IEEE754). 
+n = 6 bits 
+Exceso = 2^n/2 -1 = 2^6 /2 -1 = 31[10]
+21:50 - 
+
+
+
+Como el formato empaquetado esta configurado en base 16 y 9613 es la config decimal,
+paso el numero ta cual está, a base 16 a través de divisiones sucesivas.
+
+9613/ 16 (resto = 13)
+600/ 16 (resto = 8)
+37/16 (resto = 5)
+2
+
+
+9613[10] = 258D[16]
+Ahora que tengo la config en base 16 obtengo el umero almacenado en base 10. Como hay una
+D ene l ultimo nibble Zone entonces el numero es negativo.
+
+numero almacenado = -258 [10]
+Ahora procedo a almacenarlo en formate flotante IEEE754 de 2 bytes
+
+1°)Paso el numero a base 2 a traves de Divisiones sucesivas (metodo item anterior)
+OJO ES NEGATIVO !!!!!!!!!!
+
+258[10] = 100000010[2]
+
+
+2°)Normalizo la mantisa corriendo la coma 8 veces hacia la izquierda.
+1, 00000010 x 2^8
+
+3°)Exponente = 8[10]
+Como la presicion del exponente en exceso es de 6 bits entonces...
+Exceso = 2^n /2 -1 = 31[10]
+Exponente en exceso = 8 + 31 [10] = 39 [10]
+Paso el exponente en exceso a base 2,
+
+Exponente en exceso = 100111
+
+
+4°)Signo ---> negatuvo --> 1er bit es 1
+
+5°) Fraccion = 00000010
+
+6°)N° Final:
+2 bytes para almacenar: el signo (1 bit), el exponente en exceso 
+como BPF s/signo (6 bits) y los dígitos de la mantisa (9 bits) normalizados en base 2.
+2 bytes = 16 bits
+
+NUMERO FINAL ALMACENADO EN FORMATO FLOTANTE PROPUESTO:
+  1   |      100111        |000000100|
+sigo  |  exp. en exceso    |fraccion |
+
+Configuracion octal:
+Paso el numero anterior tal cual está a base 8 sabiendo 1 3 digitos en base 2 son 1 en base 8.
+1 100 111 000 000 100 [2]
+1  4   7   0   0   4  [8]
+
+Configuracion octal del numero almacenado e formato pedido:
+1  4   7   0   0   4  [8]
+21:50 - 22:16
+26 minutos
+
+1hora 8 min + 26 min = 1 hr 36 min
+
+
+
+
+

@@ -1,0 +1,177 @@
+Dado A que representa la configuración en base 8 de un número almacenado en formato BPF c/signo de 
+24 bits y B que representa la configuración en base 10 de otro número almacenado en formato zoneado de 
+3 bytes se pide:
+
+A = 40300514 B = 16053686
+
+a)Indicar cuales son los números almacenados en base 10
+
+b)Restarle a A el número de padrón (A-PADRÓN) en formato BPF c/signo de 24 bits indicando la 
+validez del resultado (por favor escriba su numero de padron de forma clara al inicio de este punto)
+
+c) Tomar el valor del resultado del punto anterior si es válido o el valor de B si no lo fuera y almacenarlo 
+en formato BPFlotante IEEE 754 de precisión simple, dando su configuración hexadecimal
+_____________________________________________________________________________________________________
+17:10 -
+a)Indicar cuales son los números almacenados en base 10
+
+A = 40300514
+Como A es la conif en base 8 de un BPF c/ signo, y este ult formato se escribe en base 2, 
+primero paso el numero de base 8 a base 2.
+Para ello uso el mecanismo de base potencia sabiendo que 2^3 = 8, es decir que 3 simbolos
+en base 2 represntan 1 en base 8
+
+A =  4    0   3   0      0   5	1   4 	[8] 
+A = 100 000  011 000 000 101 001 100 [2]
+
+Dado que A estaba almacenado en BPF c/s de 24 bits y el numero al que llegue tiene 24 bits
+procedo a encontrar el numero.
+
+NEGATIVO
+
+Como el primer bit es 1, hago not + 1
+
+A      = 100 000 011 000 000 101 001 100 [
+                                     11
+not(A) = 011 111 100 111 111 010 110 011
+                                     + 1 
+-----------------------------------------
+comp(A)= 011 111 100 111 111 010 110 100 
+
+Paso de base 2 a base 10 y agrego signo -
+Para ello, primero paso a base 16 para redcuir la expresion
+sabiendo que 2^ 4 = 16 (4 simbolos en base 2 son 1 en base 16)
+y luego de base 16 a base 10 con el teorema fundamental
+de la numeracion
+
+A = 0111 1110 0111 1110 1011 0100 [2]
+A =  7     E   7    E     B    4 [16]
+y ahora a base 10...
+
+7*16^5 + 14*16^4 + 7*16^3 + 14*16^2 + 11*16^1  + 4*16^0 = 8289972
+
+a) i)
+El numero almacenado en A es:
+A = - 8289972
+
+
+Para B = 16053686
+B que representa la configuración en base 10 de otro número almacenado en formato zoneado de 
+3 bytes se pide:
+
+Como el formato zonado "es" en base 16, y me dan la config en base 10, lo primero que hago
+es pasar el numero tal como viene de base 10 a base 16.
+Para ello, hago divisiones sucesivas
+
+B = 16053686 [10]
+
+16053686 / 16 (resto 6)
+1003355 / 16  (resto 11)
+62.709 / 16 (resto 5)
+3.919 / 16 (resto 15)
+244  /  16 (resto 4)
+15  /   16 (resto 15)
+0
+
+Entonces
+
+B = F4 F5 B6[16]
+
+como esta en formato zoneado, el numero almacenado es:
+Es negativo porque tiene una B en el ultimo nibble
+
+B = - 456
+
+_____________________________________________________________________________________________________
+b)Restarle a A el número de padrón (A-PADRÓN) en formato BPF c/signo de 24 bits indicando la 
+validez del resultado (por favor escriba su numero de padron de forma clara al inicio de este punto)
+
+Mi padron es: 
+P = 77625 [10]
+Lo paso a BPF c/ signo para hacer la resta
+Primero lo paso de base 10 a base 2 usando
+divisiones sucesivas.
+
+P = 10010111100111001
+
+Como es bpf de 24 bits agrego 0's a izq xa completar
+P = 000 000 010 010 111 100 111 001 en BPF c/ signo.
+
+Como neceisto restarselo a 'A' en bpf c/s 
+debo hacer A - P = A - comp(P) = A = not+1(P) = ?? 
+Hallo el complemento de P. 
+
+P      = 000 000 010 010 111 100 111 001
+                                         
+NOT(p) = 111 111 101 101 000 011 000 110
+                                     + 1
+-----------------------------------------
+Comp(P)= 111 111 101 101 000 011 000 111
+
+
+Aprpvecho que en a) obtuve la config en base 2  de  A en formato bpf c/ signo...
+
+A = 100 000  011 000 000 101 001 100 [BPF C/ S en base 2]
+
+Enotnces ya resulevo lo pedido
+
+        1111 111 11        1 11   11      
+A      = 100 000 011 000 000 101 001 100
++                                        
+Comp(P)= 111 111 101 101 000 011 000 111
+------------------------------------------ 
+res =    100 000 000 101 001 000 010 011
+
+Como los ults 2 carries con ='s (son 1) entonces el resultado es valido
+siendo este
+res =    100 000 000 101 001 000 010 011
+res =    1000 0000 0101 0010 0001 0011 skere
+
+_____________________________________________________________________________________________________________
+c) Tomar el valor del resultado del punto anterior si es válido o el valor de B si no lo fuera y almacenarlo 
+en formato BPFlotante IEEE 754 de precisión simple, dando su configuración hexadecimal
+
+R =    1000 0000 0101 0010 0001 0011
+
+Primero obtengo el valor absoluto dle numero almacenado en base 2
+Como el primer bit es 1, hago not + 1 xq es negativo
+
+NEGATIVO!!!
+
+R =      1000 0000 0101 0010 0001 0011
+                                       
+not R =  0111 1111 1010 1101 1110 1100
+                                    +1	 
+----------------------------------------
+Comp(R)= 0111 1111 1010 1101 1110 1101
+
+Valor absoluto del resultado en base 2. Aprovecho esto, ya para pasarlo a iEE flotante
+corro la coma ...
+
+01,11 1111 1010 1101 1110 1101
+
+corro la coma ... 22 veces.
+
+Exponente en exceso  = exponenete + exceso
+	Exp en excs  =     22        127  = 149[10]
+Paso a base 2...
+
+149[10] =  1001 0101 [10]
+
+Almaceno sabiendo que primer bit es 1, entonces es negativo
+
+mantisa : 11 1111 1010 1101 1110 1101 0
+Ex en exeso: 1001 0101
+Bit de signo: 1 
+
+Almacenado en BPF prec simple, 
+1|1001 0101|111 1111 0101 1011 1101 1010
+s|exo en ex| mantisa
+
+Paos de base 2 a base 16 usando qye 2^ 4 = 16 (4 simb en base 2 son 1 en 16)
+Config hexadecimal:
+
+1100 1010 1111 1111 0101 1011 1101 1010 config en base 2g
+  C   A    F    F     5    B   D   A	[16] conf en base hexadecimal
+	
+

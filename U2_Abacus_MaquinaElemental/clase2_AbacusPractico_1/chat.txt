@@ -1,0 +1,304 @@
+Martin Alejo Polese19:17
+El contenido tamb en hexa?
+LUCAS VALENTIN CORREA19:20
+carga un contenido en el AC
+LUCAS VALENTIN CORREA19:22
+puede ser que envia datos a la memoria?
+DAMIAN CARLOS OCAMPO19:22
+COpia el contenido del acumulador a memoria
+Matías Alberto Venglar19:24
+Suma el valor en la posicion de memoria indicada, con el valor en el acumulador
+NICOLAS EZEQUIEL FUNES CABANELAS19:27
+rdm
+JUAN PABLO DESTEFANIS19:27
+Jajajajajaja
+Gonzalez Andres19:27
+el registro de instruccion ?
+GUIDO AGUSTIN VERDE19:28
+RM?
+Martin Alejo Polese19:28
+El contenido que se suma al ac estaria en el rm?
+DAMIAN CARLOS OCAMPO19:30
+AC
+LUCAS VALENTIN CORREA19:30
+y eso queda en ac?
+ah buen
+pero entonces despues de una operacion vendria una instruccion de almacenamiento? (si quiero guardalo en algun lugar especifico)
+Matías Alberto Venglar19:32
+si queres guardarlo en memoria, tenés que después usar la instrucción Almacenamiento (2)
+@LUCAS
+LUCAS VALENTIN CORREA19:33
+ty
+NICOLAS EZEQUIEL FUNES CABANELAS19:34
+perdon, no entendi bien la utilidad de la bifurcacion
+claro
+gracias
+Martin Alejo Polese19:37
+Perdon, el punto de carga entonces que seria? Y por que si o si nos lo tienen que dar?
+LUCAS VALENTIN CORREA19:37
+es donde empeiza el programa
+empieza*
+Martin Alejo Polese19:38
+Ah okay, gracias, es como el puntero de inicio por asi decirlo?
+LUCAS VALENTIN CORREA19:39
+deberías cargar primero el numero A
+TOMAS FABRIZIO ORSI19:40
+o, necesitas algo en AC
+Np*
+Nazareno Quintero19:40
+no necesitarias tambien algo cargado en el operando aparte del AC ?
+Martin Alejo Polese19:40
+1 200?
+Nazareno Quintero19:41
+claro, pero tendrias que tener un B cargado previamente entonces ?
+LUCAS VALENTIN CORREA19:42
+no hace falta, acordate que lo que sumes se va a complementar con lo del AC @Nazareno
+Adán De Marco19:43
+puede repetir que sería 1200 ?
+Matías Alberto Venglar19:44
+@Nazareno, primero necesitas cargar A en el AC usando Carga (1), luego sumas B con el contenido del AC usando la operación Suma (3)
+Matías Alberto Venglar19:45
+Cuando usas Suma en este caso, vos tenés que especificar la dirección de B en la instrucción, entonces la instrucción queda como 3201
+Nazareno Quintero19:46
+god, gracias
+GUIDO AGUSTIN VERDE19:49
+pero por ejemplo si yo quisiera trabajar con el espacio de 1000 para arriba no podría con este sistema
+LUCAS VALENTIN CORREA19:54
+almacenarlo en 202
+Daniel Alejandro Hurtado Vargas19:54
+guardarlo
+FEDERICO GALANTE19:54
+almacenar en 202 lo que hay en el acumulador
+TOMAS FABRIZIO ORSI19:56
+Vamos a llegar a tener una limitacion en la cantidad de instrucciones que podemos hacer?
+A, que alivio
+TOMAS FABRIZIO ORSI19:57
+Genial, gracias
+GUIDO AGUSTIN VERDE19:59
+pero tendríamos que tener otra variable para hacer la multiplicación
+porque no hay operador de multiplicar
+Lucas Bonastre20:01
+se puede una celda para llevar esa variable contador
+LUCAS VALENTIN CORREA20:01
+podes hacer sumas sucesivas e ir restandole 1 al segundo numero, hasta llegar a 0
+Martin Alejo Polese20:02
+Tengo que sumar A veces B, o al reves
+TOMAS FABRIZIO ORSI20:05
+Sumar B veces A por ejemplo?
+GUIDO AGUSTIN VERDE20:07
+y por cada suma hacer B-1, ahí podríamos aplicar también bifurcación para evaluar condiciones
+LUCAS VALENTIN CORREA20:07
+para restar 1 en realidad deberiamos sumar -1, no?
+GUIDO AGUSTIN VERDE20:07
+si
+Martin Alejo Polese20:08
+Necesito 2 bifurcaciones, no? Una para irme al finalizar el programa y otra para irme al principio del loop
+Nazareno Quintero20:09
+se puede sumar el not de 1? o no tiene sentido eso?
+José Ignacio Castro Martinez20:09
+Analizar si A = 0 o B = 0, despues de cargar el 0
+TOMAS FABRIZIO ORSI20:09
+Puede repetir la estructura general del programa a priori por favor?
+LUCAS VALENTIN CORREA20:09
+puede ser que la inmediata sea para un valor?
+Daniel Alejandro Hurtado Vargas20:14
+16bits
+DAMIAN CARLOS OCAMPO20:14
+16
+bits
+Daniel Alejandro Hurtado Vargas20:15
+12
+Lucia Agha Zadeh Dehdeh20:15
+12
+GUIDO AGUSTIN VERDE20:15
+12
+Nazareno Quintero20:15
+12
+FEDERICO GALANTE20:15
+No será para que no overflowee??
+Branko Ivan Tintilay Tacacho20:19
+0800?
+Daniel Alejandro Hurtado Vargas20:19
+0800?
+GUIDO AGUSTIN VERDE20:19
+claro porque el cero de adelante no modifica el número (cero a la izquierda)
+Martin Alejo Polese20:20
+2048?
+LUCAS VALENTIN CORREA20:21
+por el primer bit
+MANUEL ESTEBAN HERRERA20:21
+negativo porque empieza con 1
+GUIDO AGUSTIN VERDE20:21
+0
+Lucas Bonastre20:22
+8(16) = 1000(2)
+800 (16) = 100000000000(2)
+Elias Mendoza20:23
+Pero si siempre hiciéramos esa expansión nunca podríamos tener un número negativo
+Martin Alejo Polese20:23
+Ahora empece a dudar jajaja, creo que el contenido en memoria seria 0000 1000 0000 0000, donde esos primeros 4 ceros son de la instruccion
+GUIDO AGUSTIN VERDE20:24
+representa el 800 en hexa
+Mauro Nahuel Uriarte20:24
+carga un -0 en el AC jajaja
+FEDERICO GALANTE20:25
+negativo
+Mauro Nahuel Uriarte20:26
+1100100000 es 800 en binario
+NICOLAS EZEQUIEL FUNES CABANELAS20:27
+-
+Lucas Bonastre20:27
+8(16) = 1000(2)
+JUAN PABLO DESTEFANIS20:30
+1000000000
+1000100000000000
+Branko Ivan Tintilay Tacacho20:30
+8000?
+Martin Alejo Polese20:31
+El 800? -2048?
+Mauro Nahuel Uriarte20:31
+800 == 1800?
+Lucas Bonastre20:33
+800 (16) = 100000000000(2)
+complemento a base 2  > 100000000000 es el numero -800
+NICOLAS EZEQUIEL FUNES CABANELAS20:33
+eso seria en el caso de los negativos cierto?
+Christian Nahuel Rodriguez20:33
+osea que 080 seria 0080?
+Martin Alejo Polese20:34
+Perdon, no me quedo claro el motivo de la F
+FEDERICO GALANTE20:34
+y si quisiese poner el -800?
+TOMAS FABRIZIO ORSI20:34
+Entonces en el Acumulador queda el valor F800?
+FEDERICO GALANTE20:34
+ah y si fuese 0 expando a 0
+oka oka
+Lucas Bonastre20:35
+complemnto a 2 (1000100000000000) = 0111100000000000
+entonces es -7800
+GUIDO AGUSTIN VERDE20:35
+entiendo
+Lucas Bonastre20:37
+complemento a base 2 (100000000000(2)) = 100000000000(2) es el numero -800
+
+es distinto a 
+
+complemnto a 2 (1000100000000000(2)) = 0111100000000000(2) 
+representa el umero -7800
+Christian Nahuel Rodriguez20:38
+su representacion en base 2 de F800 seria 1111100000000000
+NICOLAS EZEQUIEL FUNES CABANELAS20:38
+al hacer el NOT pasan a ser 0 no?
+Lucas Bonastre20:38
+complemnto a 2 (1111 1000 0000 000) = 0000 1000 0000 000 
+que representa el -800(16)
+Martin Alejo Polese20:41
+Esto de expandir es por esta arquitectura, no? O es en general
+Lucia Agha Zadeh Dehdeh20:42
+bifurcar al fin del programa
+GUIDO AGUSTIN VERDE20:43
+podríamos usar instrucción 7?
+TOMAS FABRIZIO ORSI20:43
+Perdon, en la 301 almacenamos 0000 en la celda 202?
+Branko Ivan Tintilay Tacacho20:43
+si
+LUCAS VALENTIN CORREA20:44
+otra forma de hacer este ejercicio podria ser guardando el numero B en una celda y en otra inicializar en 0 e ir sumando 1 hasta que sea igual al numero B? (re largo seguro igual)
+TOMAS FABRIZIO ORSI20:44
+Grcacias!
+Gracias @Ivan tambien :D
+Reginaldo Salvattore Hinojosa Baldera20:44
+pero como lo igualo si solo tengo bifurcacion con 0 ?
+LUCAS VALENTIN CORREA20:44
+para dar la condicion de corte digo
+pasa que tenes que comparar
+claro
+GUIDO AGUSTIN VERDE20:46
+verifico primero si A=0
+FEDERICO GALANTE20:49
+en vez de result podrías poner (202)??
+LUCAS RUIZ ABELLEIRA20:49
+Pero en la proxima ya no porque el 202 lo disminuis en 1 no?
+FEDERICO GALANTE20:49
+graciasss
+LUCAS RUIZ ABELLEIRA20:50
+ahh okok mala mia
+Martin Alejo Polese20:51
+No esta de mas esa linea de la 302? Porque pones B en el acum y dsp lo pisas con A?
+Branko Ivan Tintilay Tacacho20:52
+es necesario para verificar con la bifurcación 7
+Daniel Alejandro Hurtado Vargas20:55
+Entonces también hubiera sido válido inicializar también 202 en F800 y nos ahorramos las dos instrucciones iniciales?
+0000*
+GUIDO AGUSTIN VERDE20:57
+pero como armo una estructura secuencial en loop para repetir estas inestrucciones?
+al estilo del while tomando condicion de corte
+LUCAS VALENTIN CORREA20:57
+con las bifurcaciones
+Daniel Alejandro Hurtado Vargas20:57
+Oka :)
+GUIDO AGUSTIN VERDE20:57
+ahh cierto
+Elias Mendoza20:58
+La bifurcación sería como un "go to" ?
+Lucas Bonastre20:58
+sip
+LUCAS VALENTIN CORREA21:01
+Dario, podrias repetir para que es eso de forzar el acumulador?
+Mauro Nahuel Uriarte21:01
+pone el acumulador en 0 para que si o si entre a la bifurcacion
+Martin Alejo Polese21:02
+Se va a subir esa pizarra?
+NICOLAS EZEQUIEL FUNES CABANELAS21:04
+a no se modifica
+Reginaldo Salvattore Hinojosa Baldera21:05
+claro suma A +A +A .....  (200)
+
+y resta el B (201)
+Valentin Thourte21:06
+dale
+TOMAS FABRIZIO ORSI21:06
+Que hora perdon?
+Google Meet4121:06
+RETOMAMOS 21:21
+TOMAS FABRIZIO ORSI21:06
+Gracias
+José Ignacio Castro Martinez21:36
+Sumar 1000
+teniendolo en una celda previa
+Federico Luis Aguilera21:39
+siempre que en una direccion de memoria este guardada otra direccion de memoria el primer byte va a ser 0?
+Federico Luis Aguilera21:41
+ah si mala mia
+TOMAS FABRIZIO ORSI21:51
+50A Es una direccion que pusimos como referencia,no?
+Y 50B
+Perfecto
+GUIDO AGUSTIN VERDE21:52
+porque se puso 3000 en 2FE?
+Martin Alejo Polese21:56
+Disculpe profe, podriamos hacer asi un repaso rapido de como es el algoritmo?
+Martin Alejo Polese21:58
+Gracias!
+NICOLAS EZEQUIEL FUNES CABANELAS21:59
+porque es NOT +1
+TOMAS FABRIZIO ORSI22:04
+Una pregunta profesor, existe algun lugar donde podamos testear nuestro codigo Abacus? Algo como "abacus" online o algo asi?
+TOMAS FABRIZIO ORSI22:11
+Puede mostrar la consigna de nuevo?
+LUCAS VALENTIN CORREA22:21
+volves a la parte donde accedes al contenido, no?
+Adán De Marco22:22
+podrías hacer un repaso desde la 207 ?
+307*
+Mauro Nahuel Uriarte22:29
+Es una simplemente enlazada
+LUCAS VALENTIN CORREA22:38
+2306* seria en la 305
+Reginaldo Salvattore Hinojosa Baldera22:40
+F :c
+TOMAS FABRIZIO ORSI22:40
+15[10] :c
+LUCAS VALENTIN CORREA22:49
+eso que hizo recien es porque la segunda celda tiene la direccion del siguiente nodo, no?

@@ -1,0 +1,222 @@
+106001 DOUCE GERMAN A.
+EJERCICIO NUMERACION:
+
+Se tiene la siguiente secuencia de caracteres EBCDIC que representa una cadena de 4 empaquetados de 2 bytes de longitud 
+(sin superposiciones)
+
+j % a # p ? d )
+
+a) Indicar cuáles son los números almacenados en base 10 en cada empaquetado.
+
+b) Tomar el valor A como los últimos tres dígitos del número de padrón (ej.: Padrón 9876510 => A = 510) y 
+restarle el valor del primer empaquetado en formato BPF c/signo de 16 bits indicando la validez del resultado.  
+Nota: Escriba CLARAMENTE su número de Padrón.
+
+c) Tomar el valor resultado del punto anterior y almacenarlo en formato BPFlotante IEEE 754 de precisión simple expresando 
+su configuración octal.
+
+	
+	a) Indicar cuáles son los números almacenados en base 10 en cada empaquetado.
+
+Como el formato empaquetado utliza la base 16, hayo la representacion hexadecimal de la secuencia dada utilizando
+la tabla de caracteres EBECEDIC.
+  j    %   a     #    p   ?    d     )
+  91   6C  81   7B   97   6F   84    5D
+
+Ahora que tengo la secuencia en base 16, recupero los valores almacenados en cada empaquetado ya escritos en base 10.
+teniendo en cuenta que las letras C A F y E son para numeros positivos y lasletras B y D son para numeros negativos.
+
+empaquetado nro 1)  ---> 916C
+nro almacenado: 916 [10]
+
+empaquetado nro 2) ----> 817B
+nro almacenado:  -817 [10]
+
+empaquetado nro 3) -----> 976F
+nro almacenado: 976 [10]
+
+empaquetado nro 4) ------> 845D
+nro almacenado:  -845 [10]
+
+
+	b) Tomar el valor A como los últimos tres dígitos del número de padrón (ej.: Padrón 9876510 => A = 510) y 
+restarle el valor del primer empaquetado en formato BPF c/signo de 16 bits indicando la validez del resultado.  
+Nota: Escriba CLARAMENTE su número de Padrón.
+
+Mi padron: 106001
+A = ultimos 3 digitos = 001
+
+	A = 1
+
+El valor del primer empaquetado es 916[10] lo llamo B.
+B = 916 [10]
+
+Primero almaceno los 2 numeros (A y B) en formato bpf c/ SIGNO de 16 bits.
+
+	
+	Para A)
+
+El numero en base 10 es A = 1. Como el formato BPF C/ signo utliza la base 2, primero paso el valor de A a base 2.
+	1[10] = 1[2]
+A = 1[2]
+
+Ahora completo con 15 0´s a izquiera hasta alcanzar los 16 bits del formato pedido y llamo al numero
+en el formato A_1 para mayor facilidad.
+
+A_1 = 0000000000000001 (16 bits ok)
+
+
+	Para B)
+
+El valor del primer empaquetado era
+B = B = 916 [10].
+
+Para almacenarlo en BPF C/signo ,como es positivo, al igual que el numero A 
+primero lo paso de base 10 a base 2 utilizando el metodo de divisiones sucesivas:
+
+916/ 2 (resto 0)
+458/ 2  (resto 0)
+229/ 2 (resto 1)
+114/ 2 (resto 0)
+57/ 2 (resto 1)
+28/ 2 (resto 0 )
+14/ 2 (resto 0)
+7/ 2 (resto 1)
+3/ 2 (resto 1)
+1
+ 
+
+B = 910 [10] = 1 1 1 0 0 1 0 1 0 0 [2]
+
+Ahora que tengo el valor absoluto en base 2 completo con 0´s a izquierda hasta alcanzar los 16 digitos
+y llamo al numero en el formato B_1 para mayor claridad:
+
+
+B_1 = 0000 0011 1001 0100 (16 bits)
+
+
+Ahora que ya tengo A y B almacenados en fromato BPF C/signo de 16 bits, 
+hago la resta en ese formato.
+Para ello tengo en cuenta que:
+
+A_1 - B_1 = A_1 + Comp(B_1).
+
+
+Procedo a hallar el complemento de B_1 para realizar la operacion.
+(Not(B_1) + 1)
+
+B_1      = 0000 0011 1001 0100
+
+Carries:                   11        
+NOT(B_1)=  1111 1100 0110 1011
+           +                 1
+          ---------------------
+Comp(B_1)= 1111 1100 0110 1100
+
+
+Ahora procedo a realizar la cuenta:
+
+A_1 - B_1 = A_1 + Comp(B_1).
+
+
+Carries:  00                     
+A_1      = 0000 0000 0000 0001
+           +                   
+Comp(B_1)= 1111 1100 0110 1100
+          ---------------------
+A_1 - B_1= 1111 1100 0110 1101
+
+Como los ultimos 2 acarreos son iguales (0 los 2, entonces no hay overflow 
+y el resultado es VALIDO.
+
+RTA B):
+Resultado de la resta en BPF C/ Signo:
+	
+	1111 1100 0110 1101
+
+resultado valido.
+
+----------------
+(XA CORROBORAR)
+Hago  not + 1 a numero anterior	
+1111110001101101
+0000001110010010
++              1
+-----------------
+0000001110010011[2] = 915[10]
+Pero como el primer bit era 1..
+-915 [10] = 1 - 916 [10] = - 915 [10]
+OK!
+--------------
+
+
+	c) Tomar el valor resultado del punto anterior y almacenarlo en formato BPFlotante IEEE 754 de precisión simple 
+expresando su configuración octal.
+
+El valor del resultado del punto anterior es -915[10]
+Para almacenarlo en BPF/ IEEE754 de precision simple,
+
+1°) Obtengo  el valor absoluto en base 2
+
+(RCORDAR QUE ES NEGATIVO!!!!!!!!! (PARA NO OLVIDARME)
+
+Para ello paso el numero sin el signo menos de base 10 a base 2 utilizando divisiones sucesivas como ya hice en el
+item anterior.
+
+915[10] = 1110010011 [2]
+
+2°)
+Normalizo la mantisa corriendo la coma 9 veces a la izquierda.
+
+	1,110010011 x 10^9
+
+Exponente [10] = 9[10]
+
+
+3°)
+Hallo exponente en exceso.
+Exponente en exceso = Exponente + Exceso( 127[10] por ser de precision simple)
+Exponente en exceso = 9[10] + 127[10]  = 136[10]
+
+Paso el exponente en exceso de base 10 a base 2 utilizando el metodo de divisiones sucesivas.
+
+Expoente en exceso = 136[10] = 10001000 [2] (8 bits ok!)
+
+
+4°)
+Fraccion = 11001001100000000000000 (23 bits)
+(Agregué 0´s hasta alcanzar 23 bits)
+
+
+5°)SIGNO!!! --> NEGATIVO ! --> Primer bit es 1 
+
+
+6°)Nro final:
+Configuracion en base 2:
+
+1       | 10001000   | 11001001100000000000000 |  (32 bits! ok)
+1 bit       8 bits	  23 bits
+(signo) (exp en exc)    (fraccion)
+
+Para hallar la config octal del numero paso el numero tal cual esta de base 2 a base 8 sabiendo que
+como 2^3 = 8, entonces 3 digitos en base 2 representan 1 en base 8.
+
+ 011 000 100 011 001 001 100 000 000 000 000 [2]
+ 3    0   4   3   1   1   4   0   0   0    0 [8]
+
+
+RTA FINAL:
+CONFIG OCTAL DEL NUMERO ALMACEADO EN BPF IEEE 754 DE PREC simple:
+	
+	3    0   4   3   1   1   4   0   0   0    0 [8]
+
+
+No se como me ira en este ejercicicio, pero gracias por dejarnos aprobar x temas :)
+
+
+
+
+
+
+
+

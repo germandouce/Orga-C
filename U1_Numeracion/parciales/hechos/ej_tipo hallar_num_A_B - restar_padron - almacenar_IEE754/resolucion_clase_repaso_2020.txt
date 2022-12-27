@@ -1,0 +1,173 @@
+17:26 - 
+
+A = 40300514 (config en base 8 de un BPF/C signo de 24 bits)
+
+B = 16053686 (configuración en base 10 de un zoneado de 3 bytes)
+
+a)Indicar cuales son los números almacenados en base 10
+
+para el numero A = 40300514
+Puesto que el formato BPF C/signo "esta" en base 2, y el numero es una config en base 8,
+
+1°) paso el núemero tal cual esta a base 2 a traves del metodo de Base potencia.
+Como 2^3 = 8, esto significa que 1 digito en base 8 representa 3 digitos en base 2.
+
+A = 4	0   3   0   0   5   1   4  [8]
+ 
+A =100 000 011 000 000 101 001 100 [2]
+
+2°) Obtengo el numero almacenado en base 10.
+Como el primer digito es 1, se que el numero es ------NEGATIVO-------
+Entonces complemento haciendo NOT + 1
+
+A =	100 000 011 000 000 101 001 100
+
+                                    11
+NOT A = 011 111 100 111 111 010 110 011
+	+			      1
+----------------------------------------
+	011 111 100 111 111 010 110 100
+
+A complementado: 011 111 100 111 111 010 110 100
+
+3°)Quito 0's a izquierda y paso a base 10 haciendo pivot en base 16
+para reducir la expresion. 
+Pirmero por tabla sabiendo que 1 digito en base 16 representan4 en base 2
+y segundo utilizando el teorema fundamental de la numeracion.
+
+0111 1110 0111 1110 1011 0100 [2]
+ 7    E    7    E    B    4 [16] =
+
+4*16^0 + B*16^1 + E*16^2 + 7*16^3 + E*16^4 + 7*16^5 = 8289972 [10]
+
+Como era negativo..
+
+A = - 8289972 [10]
+
+------------------17:49...--------------------
+
+Para el numero B =  B = 16053686 (configuración en base 10 de un zoneado de 3 bytes)
+Como la configuracion del formato zoneado o es en base 16 y yo tengo la config en base 10, 
+
+1°) paso el numero tal cual esta a base 16 a traves dedivisiones sucesivas.
+
+16053686/ 16 (resto 6)
+1003355/ 16 (resto 11)
+62709/ 16 (resto 5)
+3919/16 (resto 15)
+244/16 (resto 4)
+15
+
+B = F4F5B6 [16]
+2°) Obtengo el numero almacenado en base 10 -> -456 (negativo pues hay una B en ult nibble)
+Los numeros almacenados en base 10 son 
+
+A = - 8289972 [10]
+B = -456 [10]
+
+
+b)Restarle a A el número de padrón (A-PADRÓN) en formato BPF c/signo de 24 bits indicando la 
+validez del resultado (por favor escriba su numero de padron de forma clara al inicio de 
+este punto)
+
+padron: 77625 [10]
+
+1°)Almaceno el padron en BPF c/signo de 24 bits
+
+Para eso paso el numero de base 10 a base 2 a traves de divisiones sucesivas (metodo
+mostrado en ej anterior)
+P = 777625 [10] =		¡OJO NO ES IGUAL AL EJEMPLO!!!!! PUSE UN 7 DE MAS!
+P = 1011 1101 1101 1001 1001 [10]
+
+y agrego 0 a izquierda, hasta obtener 24 bits.
+
+0000 1011 1101 1101 1001 1001.
+
+Como debo restarselo al numero A, obtengo el complemento.
+Comp(padron) =
+P =     0000 1011 1101 1101 1001 1001.
+
+Carry:
+NOT P = 1111 0100 0010 0010 0110 0110
+        +				 1
+        -----------------------------------
+Comp(P)=1111 0100 0010 0010 0110 0111
+
+2°) Hago la resta en BPF C/signo (ya tengo A en BPF C/signo de item anterior)
+
+Carry:   10                     1   11		->>>OVERFLOW!!
+A =       100 000 011 000 000 101 001 100
++
+Comp(P) = 111 101 000 010 001 001 100 111
+         ---------------------------------- 
+         1011 101 011 010 001 110 110 011
+Hay overflow porque los 2 ultimos acarreos no son iguales. 
+El resultado en BPF C/SIGNO de 24 Bits es: 
+
+011 101 011 010 001 110 110 011 
+
+(OK!	  011 101 011 010 001 110 110 011)
+
+SI HAGO RESTA EN BINARIO EN CALCULADORA DA BIEN !!! OJO! CHEQUEAR OVERFLOW!!
+
+18:27 - 18:42 mini break. (15 min)
+
+18:42
+c) Tomar el valor del resultado del punto anterior si es válido o el valor
+de B si no lo fuera y almacenarlo en formato BPFlotante IEEE 754 de 
+precisión simple, dando su configuración hexadecimal.
+
+Asumo que me dio lo mismo q a PAN.
+
+1000 0000 0101 0010 0001 0011
+
+1°) Obtengo el valor absoluto en base 2 del numero a 
+almacenar en flotante!
+
+como el primer bit 1 es 1, hago not + 1 para hallar el complemento.
+
+N =    1000 0000 0101 0010 0001 0011
+
+Carry:
+NOT N= 0111 1111 1010 1101 1110 1100
+       +                           1
+       ------------------------------
+       0111 1111 1010 1101 1110 1101
+      (vALOR ABSOLUTO DEL NUMERO A ALMACENAR EN FLOTANTE)
+
+1°) Normalizo a mantisa corriendo la coma 22 veces a izquierda
+01,11 1111 1010 1101 1110 1101 *2 ^ 22
+
+2°)
+Exponente = 22[10]
+Exceso = 127[10] pues almaceno en precicion simple
+=> Exponente en exceso = 127 + 22 [10] = 149[10]
+Paso exponente en exceso a base 2...
+
+Exponente en exceso = 10010101[2]
+
+3°) Signo -> negativo -> 1er bit es 1
+
+5°)Fraccion: 11 1111 1010 1101 1110 1101
+
+6°)n° final con config en base 2:
+       1|100 1010 1|111 1111 0101 1011 1101 1010	
+bits   1     8               23
+
+
+Configuracion Hexadecimal:
+Paso sabiendo que como 2^4 = 16, 4 digitos en base 2 equivalen a 1 en 16
+1100 1010 1111 1111 0101 1011 1101 1010
+ C    A    F    F    5    B     D    A
+
+RTA: 
+config en base 16: CAFF5BDA
+
+arranque ult item:
+18:47
+19:05 (con ayuda)
+tot 3er item: 18 min.
+
+
+tot numeracion = 18 min + 1hr 1min = 1hr 19 min.
+(con bastante ayuda y ejercicio facil...)

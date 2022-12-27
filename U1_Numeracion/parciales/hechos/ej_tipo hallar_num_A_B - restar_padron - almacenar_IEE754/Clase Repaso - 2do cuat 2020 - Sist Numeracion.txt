@@ -1,0 +1,99 @@
+Dado A que representa la configuración en base 8 de un número almacenado en formato BPF c/signo de 24 bits y B que representa la configuración en base 10 de otro número almacenado en formato zoneado de 3 bytes se pide:
+
+A = 40300514 B = 16053686
+
+a)Indicar cuales son los números almacenados en base 10
+b)Restarle a A el número de padrón (A-PADRÓN) en formato BPF c/signo de 24 bits indicando la validez del resultado (por favor escriba su numero de padron de forma clara al inicio de este punto)
+c) Tomar el valor del resultado del punto anterior si es válido o el valor de B si no lo fuera y almacenarlo en formato BPFlotante IEEE 754 de precisión simple, dando su configuración hexadecimal
+
+
+a)   A = 40300514  conf base 8 bpfcs 24 bits
+
+Paso a base 2 por regla de potencia (1 digito base 8 son 3 digitos base 2)
+
+4   0   3   0   0   5   1   4
+100 000 011 000 000 101 001 100  <- es negativo porque empieza con bit 1 => hago not + 1 para hallar valor absoluto
+
+
+                         011
+0111 1110 0111 1110 1011 0011
+                            1
+-----------------------------
+0111 1110 0111 1110 1011 0100|2    paso a base 16 agrupando de a 4 para reducir la expresion
+   7    E    7    E    B    4|16   paso a base 10 por multiplicaciones 
+
+7*16^5 + 14*16^4 + 7*16^3 + 14*16^2 + 11*16^1  + 4*16^0 = 8.289.972
+
+==> A = -8289972
+
+********************************************************************
+
+   B = 16053686  conf base 10 zoneado 3 bytes
+
+paso a base 16 a traves de divisiones sucesivas
+
+16053686 / 16 (resto 6)
+1003355 / 16  (resto 11)
+62709 / 16 (resto 5)
+3919 / 16 (resto 15)
+244 / 16 (resto 4)
+15
+
+F4F5B6|16   ==> el numero almacenado es -456
+********************************************************************
+******************************************************************** 
+
+b)
+Padron 77625|10   lo paso a bpf c/s de 24 bits por divisiones sucesivas por 2 (metodo ya mostrado en punto anterior)
+
+0000 0001 0010 1111 0011 1001
+
+Hallo el complemento de padron para hacer A+Comp(Padron)
+
+1111 1110 1101 0000 1100 0110
+                            1
+-----------------------------
+1111 1110 1101 0000 1100 0111   <--- Comp(Padron)
+
+
+Resuelvo A+Comp(Padron)
+
+ 11111 1111        11 1  1 1       <--ultimos 2 bits acarreo iguales ==> resultado valido!
+  1000 0001 1000 0001 0100 1100
++ 1111 1110 1101 0000 1100 0111
+  -----------------------------
+  1000 0000 0101 0010 0001 0011   <---BPF c/s de 24 bits
+
+********************************************************************
+******************************************************************** 
+
+c) 1000 0000 0101 0010 0001 0011
+
+*********   1,000 0000 0101 0010 0001 0011  * 2^23  MAL!!!! PORQUE EL PRIMER BIT EN 1 CORRESPONDE AL SIGNO DEL BPF C/S *********
+********************************************************************************************************************************
+
+
+Primero hallo el complemento haciendo not + 1
+
+1000 0000 0101 0010 0001 0011
+
+0111 1111 1010 1101 1110 1100
++                           1
+-----------------------------
+0111 1111 1010 1101 1110 1101    valor absoluto en base 2 del numero a almacenar en flotante!
+
+
+01,11 1111 1010 1101 1110 1101  *2^22
+
+
+Exp Exceso = exponente + 127 = 22´+ 127 = 149|10 = 1001 0101|2  <--exp en exceso
+
+
+1100 1010 1111 1111 0101 1011 1101 1010 conf en base 2 - Lo paso a base 16 agrupando de a 4
+   C    A    F    F    5    B    D    A |16
+
+
+
+
+
+

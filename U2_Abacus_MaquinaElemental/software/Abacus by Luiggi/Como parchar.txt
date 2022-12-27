@@ -1,0 +1,1 @@
+Para quienes quieran utilizar el emulador en una PC Pentium o similar, tienen que parchar el programa ejecutando Parchar.bat

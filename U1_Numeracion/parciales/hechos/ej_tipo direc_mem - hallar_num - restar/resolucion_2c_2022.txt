@@ -1,0 +1,142 @@
+
+Dada la siguiente secuencia en la memoria desde la dirección 50B(16) 
+hasta la dirección 513(16) inclusive:
+
+00 23 24 10 07 62 76 03 27 01 00 62
+
+Se pide:
+a) Determinar la base en la que se encuentra la secuencia.
+b) Hallar todos los empaquetados de la secuencia, sin superposición.
+c) Tomar el primer y el último empaquetado hallados en el punto anterior y 
+restarlos en formato BPF c/signo de 32 bits e indicar la validez del resultado.
+____________________________________________________________________________________________________
+17:45
+
+Como va de la 50B a la 513 puedo restarlas para obtener el numero de bits que ocupa la 
+secuencia
+
+513 - 50B + 1(inclusive) =  9
+   013   
+  513
+- 50B
+------
+  008
+(13[16] = 16+3 = 19)
+19 - B = 19 - 11 = 8
+ 
+8 + 1 = 9 bytes ocupa la secuencia.
+como 1 bytes = 8  bits, => 72 bites ocupa toda la cadena
+Mirando la cadena y contando...
+00 23 24 10 07 62 76 03 27 01 00 62 (12 *2 = 24)
+hay 24 digitos! Enotnces,
+24 digitos -> 72 bits
+1 digito -> 72/24 = ocupa 3 bits cada digito!
+Asi, 2 ^ 3 = 8
+2^(Cant de bits q ocupa un digito)
+
+EL numero esta en base 8.
+_________________________________________________________________________________
+
+b) Hallar todos los empaquetados de la secuencia, sin superposición.
+
+00 23 24 10 07 62 76 03 27 01 00 62
+
+Sabiendo que esta en base 8 y q el formato empaquteado "es" en base 16
+paso el numero de base 8 a base 16 con el mecanismo de base potencia haciendo pivot
+en base 2.
+primero sabiendo q 3 digitos en base 2 son 1 en base 8
+y luego que 4 digitos en base 2 son 1 en base 16
+
+ 0   0   2   3   2   4    1   0   0   7   6   2   7   6   0   3   2   7   0   1   0   0   6  2 						[8] = 
+000 000 010 011 010 100 001 000 000 111 110 010 111 110 000 011 010 111 000 001 000 000 110 010 [2]
+
+Ahora de base 2 a base 16
+0001 0011 0101 0000 1000 0001 1111 0010 1111 1000 0011 0101 1100 0001 0000 0011 0010 [2]
+ 1    3    5    0    8    1    F    2     F    8   3     5   C    1     0   3     2 [16]
+
+Ahora que ya esta en bade 16, Hallo los empaquetados, q estan  separados x las letras
+Hay 3 empaquetados
+1) 135081F 
+2) 2F 
+3) 835C
+_________________________________________________________________________________________
+c) Tomar el primer y el último empaquetado hallados en el punto anterior y 
+restarlos en formato BPF c/signo de 32 bits e indicar la validez del resultado.
+El primer empaquetado es 135081(10) 
+y el segundo es 835(10) 
+
+Debo hacer  135081(10) - 835(10) en BPF C/ signo. 
+
+Para ello, llamo
+A= 135081(10) 
+B = 835(10)
+
+Primero almaceno A en BPF c/ signo. Lo paso a binario.
+Paso de base 10 a base 2. Para no acer tantas cuentas,
+primero de base 10 a base 16 y luego de base 16  a base 2 
+con base potencia (4 simbolos en base 2 son 1 en hexa)
+
+De 16 a base 2 con diviones sucesivas
+
+135081/ 16
+
+135081/ 16 (resto 9)
+8.442/ 16  (resto 10)
+527 / 16 (resto 15)
+32 / 16 (resto 0)
+2 /  16 (resto 2)
+0
+
+135081/ [10] = 2 0 F A 9 [16]
+
+Ahora lo paso de base 16 base 2 sabiendo qu 2^ 4 = 16 osea
+que 1 digito en bae 16 son 4 en base 2
+
+ 2     0    F    A    9 [16]
+= 0010 0000 1111 1010 1001[2]
+
+Ahora completo con 0's a izquierda para tenerlo en formato BPF C/ s
+Hasta llegar a 32 bits
+
+-> A en BPF c/ s 0000 0000 0000 0010 0000 1111 1010 1001 [2]
+
+Como tengo que restarle B, almaceno B en BPF c/ signo 
+con el metodo de diviosnes sucesivas mostrado arriba
+835[10] = 1101000011[2]
+
+Agrego 0's a izq h llegar a 32 bits...
+B en BPF C/ signo. = 0000 0000 0000 0000 0000 0011 0100 0011
+
+COomo debo hacer A -B, pero en el formato pedido,
+hago A + comp(B).
+Busco comp(B) haciendo not + 1
+
+B      = 0000 0000 0000 0000 0000 0011 0100 0011
+                                                 
+not(B) = 1111 1111 1111 1111 1111 1100 1011 1100
+                                             + 1
+--------------------------------------------------
+comp(b)= 1111 1111 1111 1111 1111 1100 1011 1101
+
+Ahor si!
+         11111 1111 1111 1111 1111 1111 0111   1     
+A       = 0000 0000 0000 0010 0000 1111 1010 1001
++                                               
+comp(B) = 1111 1111 1111 1111 1111 1100 1011 1101
+-------------------------------------------------
+A-B     = 0000 0000 0000 0010 0000 1100 0110 0110
+
+Como los 2 ultimos carries on ='s el resultadi es valido!!
+
+	 0000 0000 0000 0010 0000 1100 0110 0110
+	134246[10]
+Para controlar, 
+  1
+ 24171
+135081
+-  835
+------
+134246
+ eskeereeee
+
+

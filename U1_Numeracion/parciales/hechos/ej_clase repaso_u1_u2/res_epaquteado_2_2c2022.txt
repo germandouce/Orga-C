@@ -1,0 +1,227 @@
+[2 ptos.] Dado A que representa la configuración octal de un número almacenado en formato empaquetado de 
+3 bytes y B que representa la configuración en base 4 de otro número almacenado en formato BPF C/signo de 
+16 bits:
+A = 4433215[8]	B = 33223120[4]
+Se pide:
+[0,5 ptos.] Indicar cuáles son los números almacenados en base 10.
+[0,75 ptos.] Restar ambos números (A-B) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+[0,75 ptos.] Si es posible, expresar el resultado de la resta anterior en formato 
+flotante IEEE 754 de precisión 
+simple dando su configuración hexadecimal.
+________________________________________________________________________________________________________________
+18:30 - 
+
+a) [0,5 ptos.] Indicar cuáles son los números almacenados en base 10.
+
+Para A = 4433215[8]
+
+Como represnta la config octal d eun empaquetado,y este ultimo formtao "esta"
+en abse 16, lo primero que hago es pasa el numero eu me dan de base 8 a base 16
+haciendo pivot en base 2.
+Primero de base 8 a abse 2 sabiendo que 2^ 3 =8. es decir que 3 simbolos en base 2
+son 1 en base 8.
+
+
+ A[8] =	  4   4  3  3    2   1   5
+ A[2] =  100 100 011 011 010 001 101
+
+
+Y ahora de base 2 a base 16 sabiendo que como 2^4 = 16, 4 digitos en base 2 son 
+1 en base 16
+
+ A[2]  =  0001 0010 0011 0110 1000 1101
+ A[16] =   1    2    3    6     8    D
+
+2°)Ahora que tengo un empaquetado de 3 bytes config en base 16, obtengo el numero en base 10 
+sabiendo que como el ult nibble tiene una D enotnces en negativo.
+
+Numero almcaenado en A = - 12368
+----------------------------------------------------------------------------------------------------------------------
+
+Para B =  33223120[4] 
+
+Puesto que el formato PBF c signo ultiliza la base 2, y tengo la config en base 4, 
+
+1°)Paso el numero tal cual está de base 4 base 2 a traves del metodo  de base potencia
+y sabiedo que 2^2 = 4, es decir 2 digitos en base 2 equivalen a 1 en base 4.
+
+B[4] =  3   3   2   2   3    1   2   0
+B[2] = 11  11  10  10   11  01  10   00
+
+2°)Ahora que tengo B en base 2, obtengo el numero almacenado en el sabiendo que represnta un BPF de 16 bits.
+
+a)Como el primer bit es 1, es 
+
+Entonces obtengo su complemento haciedno not + 1
+
+11 11 10  10   11  01  10   00
+
+Complemento con NOT  + 1
+                  
+B =	 11 11 10 10 11 01 10 00
+
+                           11 1 
+NOT(B)=	 00 00 01 01 00 10 01 11
+	 +                     1                
+---------------------------------
+Comp(B)= 00 00 01 01 00 10 10 00
+
+Ahoa que tengo el complemento, paso el numero de base 2 a base 10.
+Para ello hago pivot en la base 16 para trabajar con numeros mas chicos.
+
+primero Paso  de base 2 a base 16 con el metodo de base potencaia.
+
+[2]         0000 0101 0010 1000
+[16]         0    5    2     8 
+
+
+Y ahora de base 16 a base 10 con el TFN
+
+8*16^0 + 2*16^1 + 5*16^2 + 0*16^3 = 1320 [10]
+
+Como el primet bit era 1, entonces es negativo
+
+
+El nuemro almacenado e n B es = -1320
+__________________________________________________________________________________________________________
+
+[0,75 ptos.] Restar ambos números (A-B) en formato BPF c/signo de 16 bits indicando la validez del resultado.
+
+
+Para hacer A - B debo hacer
+A + comp(B).
+
+
+Pirmero almaceno A en BPF. 
+Paso el numero de bae 10 a base 2
+
+A = - 12368 [10]
+#NEGATIVO
+
+Para hacer menos cuentas hago pivot en la base 16.
+Paso de base 10 a base 16 con divisiones sucesivas
+
+-12368 /16 (resto 0)
+-773 / 16  (resto 5)
+-48/ 16 (resto 0)
+-3/ 16 (resto -3)
+0
+
+A = - 12368 [10] = -3050[16]
+
+
+Ahora paso de base 16 a base 2 con el metodo de base potencia
+(4 digiots en abse 2 son 1 en base 16)
+
+ - 3   0	   5     0  [16] 
+- 0011 0000 0101 0000 [2]
+
+Como el numero es negativo
+
+Obtengo su complemento con Not + 1
+
+Como era negativo hago NOT+1
+
+A=	 0011 0000 0101 0000
+                      1 111    
+Not(A) = 1100 1111 1010 1111
+	 +                 1
+	----------------------------
+COMP(A)= 1100 1111 1011 0000
+
+
+A en BPF con sgno : 1100 1111 1011 0000
+
+Ahora ya puedo hacer la resta
+A - B = A + comp(B)
+
+(en realidad es Comp(A) xq era negativo
+
+El complemento de B ya lo tengo del ej anterior asi que...
+
+            1 111   1        
+COMP(A)= 1100 1111 1011 0000
+                           +
+Comp(B)= 0000 0101 0010 1000
+_____________________________
+A-B    = 1101 0100 1101 1000  = C
+
+Como los ultimos 2 acarreos son iguales (0 0) entonces el resultado es valido!
+_______________________________________________________________________________________________________________
+c) [0,75 ptos.] Si es posible, expresar el resultado de la resta anterior en formato 
+flotante IEEE 754 de precisión 
+simple dando su configuración hexadecimal.
+
+Pimro obetngo el  valor absolutp del nuemro en base 2
+Como el primer bit es 1, enotnces el numero es negativo.
+LLmao al res = C
+Hago COMP(c) con not + 1
+
+C=	 1101 0100 1101 1000
+
+                        111
+Not(C) = 0010 1011 0010 0111
+	 +                 1
+	----------------------------
+COMP(C)= 0010 1011 0010 1000
+
+Ya tengo el valor absoluto de C en base 2.
+
+1)Nomrlaizo la mantisa corriendo la coma
+  1,0101100101000 2^13
+
+Corro la coma 13 veces
+=>exponete = 13 [10]
+
+2) Exp en exceso. Como es presicion simple
+Exceso = 127 [10]
+Exp en exceso = exp    + exceso =
+Exp en exceso = 13[10] +  127[10] = 140[10]
+
+Pasado a base 2,
+
+140[10] = 10001100
+
+4to) Signo-> 1 xq era negatuvo
+
+5)almaceno el numero
+signo = 1
+Exp en Exc = 10001100
+Fraccion = 000 0000 0000 1011 0010 1000 
+
+1     |10001100| 000 0000 0000 1011 0010 1000 
+1 bit |  8 bits| 23 bits
+
+
+Config hexadecimal del numero almacenado:
+Paso el nuemro de base 2 a base 16 con base potencia 
+(4 simbolos en base 2 son 1 en 16)
+
+1100 0110 0010 1100 1010 0000 0000 0000
+
+Rta:
+Config en base 16:  C62CA000
+
+Fin: 19:20
+
+50 min
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

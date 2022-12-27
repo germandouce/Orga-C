@@ -1,0 +1,35 @@
+Se tiene una lista (L) cuya dirección de inicio se encuentra almacenada en la celda 200(16). Esta lista representa las 
+recaudaciones de los camiones de caudales CAUDALES SRL. Cada nodo de la lista (L) está formado por 4 celdas contiguas en memorias:
+
+La primera celda contiene el código de recorrido del camión.
+
+La segunda celda contiene el turno en que se usó ese camión (1 = mañana, 2 = tarde y 3 = noche).
+
+La tercera celda contiene el número de legajo del conductor.
+
+La última celda contiene la dirección del siguiente nodo de la lista. El final de la lista (L) se indica con un valor –1 
+en la última celda del último nodo.
+
+Se pide realizar un programa ABACUS con punto de carga en la celda 300(16) que recorra la lista (L) y genere un vector 
+(V) con comienzo en la celda 100(16) cuyo contenido sean:
+
+PADRÓN PAR:  los números de legajo de los empleados del recorrido que se encuentra almacenado en la celda 201(16) y 
+que hayan realizado el turno almacenado en la celda 202(16). 
+
+PADRON IMPAR:  los códigos de recorrido del camión que realizó el conductor cuyo legajo se encuentra almacenado en la 
+celda 201(16) y que haya realizado el turno almacenado en la celda 202(16). 
+
+Marcar el final del vector (V) con un valor -1 en la última celda.
+
+Datos de la máquina: L(RPI) = 12 bits; L(CO) = 4 bits
+
+Código de operaciones:
+
+0 – Carga inmediata      3 – Suma                      8 – Bifurcación si (AC) > 0
+
+1 – Carga              4 – Not (AC)                          9 – Bifurcación si (AC) < 0
+
+2 – Almacenar     7 – Bifurcación si (AC) = 0      F – Fin de programa
+
+NOTA: Para aprobar el ejercicio debe tener correctamente resuelto el 60% del mismo. Las respuestas 
+que no estén justificadas o estén mal justificadas se considerarán erróneas. Por favor lea bien el enunciado.

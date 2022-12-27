@@ -1,0 +1,208 @@
+Dado A que representa la configruaicon en base 10 de un numero en formato binario punto dijo con 
+signo de 2 bytes y B que representa la configuracion en base 8 de otro numrto almacenado en 
+formato empaquetado de 3 bytes se pide:
+
+A = 11111 (10)
+B = 250415 (8)
+
+a) Indicar cuales son los numeros almacenados en base 10
+b) Realizar la division enyera de su numero de padron por 5. A eso le llamamos p. Restar el valor
+alamcenado en A con P (A -P) en formato BPF C/Signo de 16 bits indicando la validez del resultado.
+Ej apdron 1001123 => p es 20024.
+c) Tomar el valor del resultado del punto anterior si es valido o el valor de B si no lo fuera y
+almacenarlo em formato BPFlotante IEEE 754 de precisio simple, dando su configuracion octal.
+
+A = 11111 (10) 
+
+como es la confuguracion en base 10 de un bpf y el bpf es un formato en base 2, lo paso
+de base 10 a base 2
+
+podria hacer divisiones sucesivas y es una cuenta muy larga y fea
+pero es mas facil hacer pivot en 16...
+1) paso de (10) a (16) y luego 
+2)bis de (16) a (2) sabiendo que 2^4 = 16
+entonces por rela de potencia cada simbolo en base 16 representan 4 en base 2
+
+
+11111 |__16__
+	694 |__16___
+   7		43  |___16__
+	 6	        2   |_16___
+		B(11)		2
+			0
+
+11111 (10) = 2B67 (16)
+
+y ahora (16)-> (2)
+
+2B67 (16) =  0010 1011 0110 0111 (2)
+
+0010 1011 0110 0111 (2) representa un BPF c/s de 2 bytes osea 61 bits. 
+- Si hubiera tenido 17 bits con un 0 en la ult posicion lo puedo truncar xq es el mismo numero
+- Ahora si me daba con 17 bis pero con un 1 la cagaron los profe. Lo peudo truncar pero no es el mimso numero
+- si terminaba en 1 pero era menso de 16 bits 15 14, completo a izq con 0's
+Ya esta en el formmato!
+-Si tengo que pasar de formtao bpf 8 bits a 16 bits, y HAY 1 UNO ADELANTE, COMPLETO CON 1'S xq dsps al hacer 
+Not + 1 qudan en 0
+
+
+2) Vemos el formato. 
+
+0010 1011 0110 0111
+Como el primer bit es 0, entonces es positivo no hace falta complementar
+
+Por lo tanto, solo me queda pasar a base 10.
+
+Podria hacer (2) -> (10) con multiplicaciones sucesivas
+ 1*2^13 + 1*2^11 ...
+
+o 
+(2) -> 16 con potencia y luego
+(16)-> 10
+
+0010 1011 0110 0111
+   2  B    6    7
+
+TFN (2*16^3) + (11*16^2) + (2*16^1) + 7*16^0 
+
+A)
+0010 1011 0110 0111(2) = 11111(10)
+
+
+___________ RTa a) I) EL  NUEMRO ALMACENADO EN A ES A) 11111(10) _____
+
+B = 250415 (8)
+
+Como es la config en base 8 de un formato empaquetado de 3 bytes y el
+formato empaquetado se escribe en base 16, debo pasarlo de base 8 a 16 tal cual esta.
+Hago pivot en base 2.
+(8) -> (2) -> (16)
+
+1) 
+(8) -> (2) sabiendo que 2^3 = 8 osea q digito en base 8 son 3 en base 2
+(2) -> sabiendo que 2^4 = 16
+2	5	0	4	1	5	8 (8)
+010    101     000     100     001     101 (2)
+0001 0101 0001 0000 1101 (2)
+2) 1     5    1    0    D (16)
+
+OJOOOO
+1D510D no es un empaquetado valido!! revisar calculos
+
+Conociendo el formato empaquetado y viendo que el ultimo nibble tiene un D,
+que indica negativo entonces el numero almacenao en base 10 es
+Obtenemos ele nro almacenado en B -> = - 1510
+
+----------------------------------------------------------------------
+
+b) Realizar la division enyera de su numero de padron por 5. A eso le llamamos p. Restar el valor
+alamcenado en A con P (A -P) en formato BPF C/Signo de 16 bits indicando la validez del resultado.
+
+A-P -> A + Comp (P) 
+
+1) Hallar A y P
+
+A ->11111(10)
+p -> 106957/5 = 21391 es mi numero p
+(la resat debria dar negativa pues 11111 - 21391 = -10280)
+0010100000101000
+1101011111010111
+1101011111011000 en bpf c/ signo
+
+2) Como es BPF c/ signo los 2 numeros 
+
+A = 0010 1011 0110 0111 (2)
+
+P -> pasamos de base 10 a base 16 y luego a base 2 para escribirlo en bpf
+      P = 0101 0011 1000 1111 (2)
+Comp(P) =  Not(P) + 1
+    P =   0101 0011 1000 1111 (2)
+
+Not(p)=   1010 1100 0111 0000 
++ 1      		  1
+-----------------------------
+Comp(P) = 1010 1100 0111 0001
+  
+carry:   001 1      11  111
+A =       0010 1011 0110 0111 (2)
++                                 
+Comp(P) = 1010 1100 0111 0001 (2)
+----------------------------------
+          1101 0111 1101 1000 
+
+Como los dos ultimos carries son ='s a 0 (00)  es valido!
+
+Rta) A + P = 1101 0111 1101 1000  (2) es valido en BPF con signo
+             1101 0111 1101 1000 (ta ok)
+--------------------------------------------------------------
+c) Tomar el valor del resultado del punto anterior si es valido o el valor de B si no lo fuera y
+almacenarlo em formato BPFlotante IEEE 754 de precisio simple, dando su configuracion octal.
+
+Almacenar en BPF IEEE 754 PS -> 32 Bits.
+
+
+1) Obtengo el numero
+    
+     R = 1101 0111 1101 1000  (2) -> como el primer bit es 1, aplico not + 1
+
+Not(R) = 0010 1000 0010 0111
++ 1                       +1 
+-----------------------------
+       - 0010 1000 0010 1000
+
+
+El numero es - 0010 1000 0010 1000 (2)
+
+2) Ponemos en BPFlotante (|-|:|-|)
+
+-> S M x B Exponente
+	Mantisa -> normalizada => Tomo el numero y lo normalizo: 
+		- 1,0 1000 0010 1000 x 2^13
+3)Almacenamos en BPFlotante
+S =	1 
+EExc	Exp + 127(simple) = 
+     =  13(10)	+127(10) = 140(10)
+EExc =     1000 1100 (2)  (8 bits ok)
+
+M = 0100000101000|0000000000
+
+Entonces el numero almacenado en formato IEEE 754 de PS
+1|1000 1100|01000001010000000000000
+S|  EEXC   | Mantisa Normalizada
+
+Me pdien config octal asi q paso el choclo anterior tal como esta de base 2 a base 8
+(2) -> (8) usando base potencia  y sabiendo que 2^3 = 8 tonces
+3 digitos en base 2 son 1 en base 8. agrupamos de a 3
+011 000 110 001 000 001 010 000 000 000 000
+ 3   0   6   1   0   1   2   0    0  0  0 (8)
+
+RTA c) 
+Entonces la config en base 8 del numero almacenado en BPF ES:
+30610120000 (8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

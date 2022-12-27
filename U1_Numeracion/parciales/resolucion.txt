@@ -1,0 +1,58 @@
+75.03 ORGANIZACIÓN DEL COMPUTADOR
+ Ejercicio de Parcial
+
+
+Dada la siguiente secuencia en la memoria desde la dirección 50B(16) hasta la dirección 513(16) inclusive:
+
+00 23 24 10 07 62 76 03 27 01 00 62
+
+Se pide:
+a) Determinar la base en la que se encuentra la secuencia.
+b) Hallar todos los empaquetados de la secuencia, sin superposición.
+c) Tomar el primer y el último empaquetado hallados en el punto anterior y restarlos en formato BPF c/signo de 32 bits e indicar la validez del resultado.
+
+a)
+	513 - 50B + 1(inclusive) = 9	9 bytes x 8 bit/bytes = 72 bits
+
+	24 dígitos ---> 72 bits
+	 1 dígito  --->  3 bits		3 bits => 2exp3 = 8
+
+	La base es 8.
+
+b) 
+	base 8 -> base 2 -> base 16
+
+ 0   0   2   3   2   4   1   0   0   7   6   2   7   6   0   3   2   7   0   1   0   0   6   2  (8)
+
+000 000 010 011 010 100 001 000 000 111 110 010 111 110 000 011 010 111 000 001 000 000 110 010 (2)
+
+0000 0001 0011 0101 0000 1000 0001 1111 0010 1111 1000 0011 0101 1100 0001 0000 0011 0010       (2)
+
+ 0    1    3    5    0    8    1    F    2    F    8    3    5    C    1    0    3    2         (16)
+
+01 35 08 1F 2F 83 5C 10 32 (16)
+
+0135081F 2F 835C
+
+c)                                             _
+	135081(10) - 835(10)		A - B = A + B
+
+A = 135081(10) = 20FA9(16) = 0000 0000 0000 0010 0000 1111 1010 1001(2)
+
+B = 835(10) = 343(16) = 0000 0000 0000 0000 0000 0011 0100 0011(2) =>
+		    _
+		    B = 1111 1111 1111 1111 1111 1100 1011 1100(2) + 1 =
+		    _
+		    B =	1111 1111 1111 1111 1111 1100 1011 1101(2)
+
+
+ 1 1111 1111 1111 1111 1111 1111 0111 001   (acarreo)
+
+A: 0000 0000 0000 0010 0000 1111 1010 1001(2)
++
+_
+B: 1111 1111 1111 1111 1111 1100 1011 1101(2)
+---------------------------------------------
+   0000 0000 0000 0010 0000 1100 0110 0110(2)		Para controlar: 20C66(16) = 134246(10)
+
+Válido por que el último acarreo y el exterior son iguales.

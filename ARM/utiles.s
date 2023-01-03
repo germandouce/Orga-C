@@ -1,19 +1,31 @@
-	.equ SWI_Print_String, 0x02
-	.equ SWI_Exit, 0x11
+	.equ SWI_Open_File, 0x66
+	.equ SWI_Read_Int, 0x6C
+	.equ SWI_Close_File, 0x68
+	.equ SWI_Print_Char, 0x00
+    .equ SWI_Print_Str, 0x69
+    .equ SWI_Print_Int, 0x6B 
+    .equ SWI_Exit, 0x11 @ solicita a ARMSim que salga del programa   
+    
+    .data
+cadena: 
+    .asciz "linea"
 
-	.data
-first_string:
-	.asciz "Hola\n"
+first_string: 
+    .asciz "Hola\n"
+
 second_string:
 	.asciz "Chau\n"
 
-	.text
-	.global _start
+entero:
+    .word 78
+
+    .text
+
+    .global _start
+
 _start:
 	ldr r3, =first_string
 	bl 	print_r3 @bifurco a print_r3
-	ldr r3, =second_string
-	bl 	print_r3 @ojo, b and link vuelve
 	b 	fin @b etiqueta
 	@en cambio b solo bifruca, no vuelve
 
@@ -25,7 +37,7 @@ print_r3:
 	swi SWI_Print_String @lo imprimo
 	ldmfd sp!, {r0,pc} 
 	@piso el valor del pc con el de lr q guarde en el stack
-
+    @y vuelvpo al lin=
 fin:
 	swi SWI_Exit
 	.end

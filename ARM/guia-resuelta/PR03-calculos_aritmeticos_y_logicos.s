@@ -18,6 +18,7 @@ _start:
 
 		@ (r2) = (r0) + (r1)
 		add r2, r0, r1
+		add	r2, r0 @El operando 1 y el de destino son el mismo. funca igual;
 
 		@ (r3) = (r0) - (r1)
 		sub r3, r0, r1

@@ -1,3 +1,9 @@
+@ Práctica 6. Mostrar cálculos aritméticos y lógicos
+@ Escribir el código ARM que ejecutado bajo ARMSim# realice las siguientes operaciones
+@ aritméticas y lógicas sobre dos enteros almacenados en un archivo: Suma, Resta,
+@ Multiplicación, AND, OR, XOR, Shift Izquierda, Shift Derecha, Shift Derecha Aritmética. Imprimir
+@ por pantalla los resultados de las operaciones en sus propias líneas.
+
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B

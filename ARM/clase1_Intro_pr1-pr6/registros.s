@@ -1,3 +1,7 @@
+@Linkedicion
+El codigo objecto es un ejecutable el .o
+que se genera con el ensamblador
+
 @Registros
 REGISTROS DE PROPOSITO GENERAL
 @R10 A R12
@@ -37,9 +41,11 @@ swi codigoDeImpresion
 @! significa actualizar
 @siempre usaremos como FD = Full Desscending
 stmfd sp!, {r0,lr}  @para apilar (push)
-@los parametros son los que quiero apilar
+@los parametros son los que quiero apilar 
+@(porque la store recibe parametros para guardar)
 ldmfd sp!, {r0,PC}  @para desapilar (pop)
-@los parametros son donde desapilo no LO que desapilo
+@los parametros son donde desapilo no LO que desapilo 
+@(porque la load recibe parametros de donde cargar)
 @Ahora
 @r0 = r0 
 @lr = pc. vuelve al lugar donde debia ir
@@ -64,7 +70,7 @@ and r5, r0, r1
 @ (r6) = (r0) OR (r1)
 orr r6, r0, r1
 
-@EXCLUSIVE OR
+@EXCLUSIVE OR (XOR)
 @true y true = false
 @false y falase = false
 @1 y 0 = 1
@@ -136,4 +142,6 @@ mov r0, r1, ASR #n @ LSL: logical shift left
 @se puede hacer
 mov r1, r1, LSR #n solo hago la shift de r1 y SI lo modifico
 
-@
+@[ registro ] = [r0] : lo q apunta r0
+ldr r0,=file @r0 = direc de mnemoria de "file"
+ldr r0,[r0] @r0 = lo q apunta r0 = primer char/ (int de file)

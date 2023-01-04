@@ -1,3 +1,11 @@
+@ Práctica 5. Negar enteros desde archivo
+@ Escribir el código ARM que ejecutado bajo ARMSim# lea dos enteros desde un archivo e
+@ imprima:
+@ El primer entero en su propia línea.
+@ El resultado de aplicar NOT al primer entero en su propia línea.
+@ El segundo entero en su propia línea.
+@ El resultado de aplicar NOT al segundo entero en su propia línea.
+
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B
@@ -33,14 +41,24 @@ read_loop:
         ldr r0,=InFileHandle
         ldr r0,[r0]
         swi SWI_Read_Int
-        bcs EofReached
+        bcs EofReached  @bcs carry es 0, fin de prgm
         @ el entero está ahora en r0
 
         mov r2, r0
 
+@imprimo el primer entero en su propia linea
         mov r1, r2
-        bl print_r1_int
-        mov r3, #-1
+        bl print_r1_int @imprime el numero en r1 como un entero
+        mov r3, #-1     @cargo -1 en un registro 
+        @r3 = 1111 1110
+        @63 [10] = 0011 1111
+        @r3  = 1111 1111
+        @xor (resultado de aplicar not al primer entero)
+        @ma da el opuesto xq si habia 1, contra 1 da 0. si habia 0, contra 1 da 0.
+        @r2  = 0011 1111
+        @r1  = 1100 0001
+        @(literal hace not (-63) y resta 1 -> -64)
+        @5 -> -6
         EOR r1, r2, r3          @ (r1)=NOT(r2)
         bl print_r1_int
         b read_loop
@@ -55,5 +73,10 @@ print_r1_int:
 
 InFileError:
 EofReached:
+        @cierro archivo
+        ldr r0,= InFileHandle @[ro] -> InFileHanlde
+        ldr r0,[r0] @[ro] = InFileHanlde
+        swi 0x68
+
 	swi SWI_Exit
 	.end

@@ -1,3 +1,7 @@
+@ Práctica 4. Entrada y Salida de entero
+@ Escribir el código ARM que ejecutado bajo ARMSim# que lea un entero desde un archivo e
+@ imprima el mismo entero por pantalla.
+
         @ constantes
     	.equ SWI_Open_File, 0x66
 		.equ SWI_Read_Int, 0x6C

@@ -1,4 +1,10 @@
-	.equ SWI_Print_String, 0x02
+@ Práctica 9: Cálculo de mínimo y máximo
+@ Escribir el código ARM que ejecutado bajo ARMSim# lea dos enteros desde un archivo e
+@ imprima el mínimo y el máximo respectivamente de la siguiente manera:
+@ Min: <mínimo>
+@ Max: <máximo>
+
+    .equ SWI_Print_String, 0x02
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B
@@ -38,23 +44,25 @@ _start:
     bl read_int
     mov r3, r0
 
+@Algorimo de min max
     cmp r2, r3
     blt print_result
-    mov r1, r2
-    mov r2, r3
-    mov r3, r1
+    @pivote en r1
+    mov r1, r2  @r1 = r2 =maxTemp
+    mov r2, r3  @R2 = r3 = MIN  
+    mov r3, r1  @R3 = r1 = MAX    
 
 print_result:
     ldr r0, =Stdout
     ldr r1, =min_header
     swi SWI_Print_Str
-    mov r1, r2
+    mov r1, r2  @siempre dejo en r2 el MIN
     bl print_r1_int
 
 	ldr r0, =Stdout
     ldr r1, =max_header
     swi SWI_Print_Str
-    mov r1, r3
+    mov r1, r3  @ siempre dejo en r3 el MAX
     bl print_r1_int
 
     b exit

@@ -1,3 +1,8 @@
+@Práctica 17: Mostrar elementos de un vector utilizando direccionamiento por 
+@registro indirecto con post-incremento
+@Modificar el ejercicio para utilizar direccionamiento por registro 
+@indirecto con post-incremento.
+
 	.equ SWI_Print_Int, 0x6B
 	.equ SWI_Exit, 0x11
     .equ SWI_Print_Str, 0x69
@@ -27,6 +32,10 @@ mostrar_loop:
 mostrar_elemento:
 	stmfd 	sp!, {r0,r1,lr}		@ Stack: r0 y r1
     ldr 	r0, =Stdout
+	@r1 = direc de mem en r2.
+	@y al mismo [r2] + 4 bytes
+	@esto es post incremento. Agregarle al final de la load que hago de mem
+	@lo q incremento el r2. Lee y suma.
 	ldr 	r1, [r2], #4
     swi 	SWI_Print_Int
     ldr 	r1, =eol

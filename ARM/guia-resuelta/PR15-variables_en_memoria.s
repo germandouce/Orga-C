@@ -1,3 +1,8 @@
+@ Práctica 15: Imprimir y reemplazar enteros almacenados en memoria
+@ Escribir el código ARM que ejecutado bajo ARMSim# imprima dos valores 
+@enteros definidos en memoria, los reemplace por otros dos valores e 
+@imprima los dos nuevos valores.
+
 	.equ SWI_Print_Int, 0x6B
 	.equ SWI_Exit, 0x11
 	.equ SWI_Print_Char, 0x00

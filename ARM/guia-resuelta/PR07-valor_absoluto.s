@@ -1,3 +1,8 @@
+@ Práctica 7: Cálculo de valor absoluto con instrucciones condicionales
+@ Escribir el código ARM que ejecutado bajo ARMSim# lea un entero desde un archivo e imprima
+@ el valor absoluto del entero. Utilizar instrucciones ejecutadas condicionalmente y no utilizar
+@ bifurcaciones condicionales.
+
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B
@@ -26,11 +31,16 @@ _start:
 	swi SWI_Close_File
 
 	@ chequear si el entero leído es menor a 0
-	cmp r2, #0
+	cmp r2, #0	@r2 - 0
+	@r2 = int
 
 	@ si es: sobrescribir el entero con su negación aritmética
-	mov r3, #0
-	submi r2, r3, r2
+	@alternativa para no restar contra cero
+	@rsbmi r2,#0
+
+	mov r3, #0	@r3 =0
+	submi r2, r3, r2 @deja el valor absoluto en r2
+	@r3 - r2 = 0 - r2 (solo se ejecuta si la cmp da negativo)
 
 	@ mostrar el entero
 	mov r0, #1

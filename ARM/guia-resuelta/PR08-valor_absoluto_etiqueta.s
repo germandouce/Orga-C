@@ -1,3 +1,7 @@
+@ Práctica 8: Cálculo de valor absoluto con bifurcación
+@ Escribir el código ARM que ejecutado bajo ARMSim# lea un entero desde un archivo e imprima
+@ el valor absoluto del entero. Utilizar bifurcaciones condicionales.
+
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B
@@ -28,12 +32,13 @@ _start:
 	@ chequear si el entero leído es menor a 0
 	cmp r2, #0
 
+	@si es positivo
 	@ si no lo es: saltar a mostrar
 	bpl mostrar
 
 	@ si lo es: negamos el valor de r2
 	sub r2, r3, r2
-
+	@y dsps mostramos incondicionalmente
 mostrar:	
 	@ mostrar el entero
 	mov r0, #1

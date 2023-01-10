@@ -1,3 +1,26 @@
+@ Práctica 12: Cálculo de factorial
+@ Escribir el código ARM que ejecutado bajo ARMSim# lea un entero desde un archivo, calcule el
+@ factorial de ese entero y muestre los valores intermedios del proceso. El algoritmo podría
+@ resumirse como:
+@ n = <<entero leído desde archivo>>
+@ accum = 1
+@ while (n != 0) {
+@ accum = accum * n
+@ print accum
+@ print "\n"
+@ n = n - 1
+@ }
+@ print accum
+@ print "\n"
+@ Una salida aceptable del programa sería, para el caso que el valor de entrada fuera 5:
+@ 5
+@ 20
+@ 60
+@ 120
+@ 120
+@ 120
+@ Puede asumirse que el archivo no contendrá un entero negativo.
+
 	.equ SWI_Open_File, 0x66
 	.equ SWI_Read_Int, 0x6C
 	.equ SWI_Print_Int, 0x6B
@@ -35,15 +58,20 @@ _start:
     mov r1, #1
 
 factorial:
+    @es cero?
     cmp r0, #0
+    @si es cero bifurco, si no, sigo
     beq factorial_end
+    @ r1 = r0*r1 = 7 * 1 (en primera vuelta )
+    @ r1 = 6*7 = 42 (segunda vuelta)
     mul r1, r0, r1
     bl print_r1_int
+    @r0 -=1 7-> 6
     sub r0, r0, #1
-    b factorial
+    b factorial @vuelvo dar otra vuelta
 
 factorial_end:
-    bl print_r1_int
+    bl print_r1_int @r1= resultado del factorial
     b exit
 
 @read integer from file

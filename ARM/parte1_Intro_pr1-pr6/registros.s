@@ -145,3 +145,12 @@ mov r1, r1, LSR #n solo hago la shift de r1 y SI lo modifico
 @[ registro ] = [r0] : lo q apunta r0
 ldr r0,=file @r0 = direc de mnemoria de "file"
 ldr r0,[r0] @r0 = lo q apunta r0 = primer char/ (int de file)
+
+@ARCHIVOS GENERAL
+
+ldr r0,=filename        @ set Name for input file
+mov r1,#0               @ mode is input
+swi SWI_Open_File       @ open file for input
+bcs InFileError         @ if error?
+ldr r1,=InFileHandle    @ load input file handle
+str r0,[r1]             @ save the file handle

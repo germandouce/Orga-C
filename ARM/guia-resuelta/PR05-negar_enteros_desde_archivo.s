@@ -49,7 +49,7 @@ read_loop:
 @imprimo el primer entero en su propia linea
         mov r1, r2
         bl print_r1_int @imprime el numero en r1 como un entero
-        mov r3, #-1     @cargo -1 en un registro 
+        mov r3, #-1     @ (*) cargo -1 en un registro 
         @r3 = 1111 1110
         @63 [10] = 0011 1111
         @r3  = 1111 1111
@@ -59,7 +59,10 @@ read_loop:
         @r1  = 1100 0001
         @(literal hace not (-63) y resta 1 -> -64)
         @5 -> -6
-        EOR r1, r2, r3          @ (r1)=NOT(r2)
+        EOR r1, r2, r3          @ (*) (r1)=NOT(r2)
+        @EOR r1, r2, #-1    @ESTO NO SIRVE XQ -1 LO TOMA COMO UNA CTE
+        @NO COMO UN NUMERO      @ (r1)=NOT(r2)
+
         bl print_r1_int
         b read_loop
 
